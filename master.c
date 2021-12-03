@@ -47,29 +47,21 @@ void create_fifo(const char *name)
     mkfifo(name, 0666);
 }
 
-void interpreter()
+int interpreter()
 {
     int c;
-    printf("How many numbers do you want to send?\n");
+    printf("\nHow many numbers do you want to send?\n");
     scanf("%d", &input_size);
     printf("Choose a modality: \n");
     printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n");
     scanf("%d", &c);
+    fflush(stdout);
 
     if (c == 1) // 1
     {
         printf("Transfering data through named pipe...\n");
         fflush(stdout);
-
-        char input_size_char[20];
-        sprintf(input_size_char, "%d", input_size);
-
-        char *arg_list_producer_named[] = {"./producer_named", input_size_char, (char *)NULL};
-        pid_producer_named = spawn("./producer_named", arg_list_producer_named);
-        char *arg_list_consumer_named[] = {"./consumer_named", input_size_char, (char *)NULL};
-        pid_consumer_named = spawn("./consumer_named", arg_list_consumer_named);
-
-        wait(NULL);
+        return c;
     }
     else if (c == 2) // 2
     {
@@ -92,12 +84,22 @@ void interpreter()
 /* MAIN */
 int main()
 {
-    // named pipe
-    create_fifo("/tmp/fifo_p_to_c");
 
     while (1)
     {
-        interpreter();
+        int command = interpreter();
+        if (command == 1) // named pipe
+        {
+            create_fifo("/tmp/fifo_p_to_c");
+            char input_size_char[20];
+            sprintf(input_size_char, "%d", input_size);
+            char *arg_list_producer_named[] = {"./producer_named", input_size_char, (char *)NULL};
+            pid_producer_named = spawn("./producer_named", arg_list_producer_named);
+            char *arg_list_consumer_named[] = {"./consumer_named", input_size_char, (char *)NULL};
+            pid_consumer_named = spawn("./consumer_named", arg_list_consumer_named);
+            wait(NULL);
+        }
+        // if(command==2){}
     }
     unlink("/tmp/fifo_p_to_c");
     return 0;

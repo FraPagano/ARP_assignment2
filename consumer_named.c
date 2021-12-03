@@ -20,7 +20,18 @@ int main(int argc, char *argv[])
     const int size = atoi(argv[1]);
     int data[size];
     fd = open(fifo, O_RDONLY);
-    read(fd, data, sizeof(int) * size);
+
+    for (int i = 0; i < size; i++)
+    {
+        read(fd, &data[i], sizeof(int));
+    }
+
     clock_gettime(CLOCK_REALTIME, &end);
+    for (int i = 0; i < size; i++)
+    {
+        printf("%d", data[i]);
+        fflush(stdout);
+    }
+    sleep(1);
     return 0;
 }

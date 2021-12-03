@@ -27,7 +27,13 @@ int main(int argc, char *argv[])
     fd = open(fifo, O_WRONLY);
 
     clock_gettime(CLOCK_REALTIME, &start);
-    write(fd, data, sizeof(int) * size);
 
+    for (int i = 0; i < size; i++)
+    {
+        write(fd, &data[i], sizeof(int));
+    }
+
+    double time_start = 1000000000 * (start.tv_sec) + (start.tv_nsec);
+    sleep(1);
     return 0;
 }
