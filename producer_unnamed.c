@@ -21,7 +21,7 @@ struct timespec start;
 int main(int argc, char *argv[])
 {
     int size = atoi(argv[1]);
-    int fd = atoi(argv[2]);
+    fd = atoi(argv[2]);
     int data[MAX];
 
     fd_time_start = open(fifo_time_start, O_WRONLY);
@@ -51,8 +51,5 @@ int main(int argc, char *argv[])
     {
         write(fd, &data[i], sizeof(int));
     }
-
-    sleep(1);
-
     return 0;
 }
