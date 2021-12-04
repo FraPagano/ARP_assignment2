@@ -71,7 +71,7 @@ int interpreter()
         {
             printf("Transfering data through named pipe...\n");
             fflush(stdout);
-            return c;
+
         }
         else if (c == 2) // 2
         {
@@ -90,6 +90,7 @@ int interpreter()
             printf("Please, use the commands above\n");
         }
     }
+    return c;
 }
 
 /* MAIN */
@@ -136,6 +137,50 @@ int main()
 
             unlink("/tmp/fifo_p_to_c");
         }
+        if (command == 2) // unnamed pipe
+        {
+            int fd_unnamed[2];
+            pipe(fd_unnamed);
+
+            char input_size_char[20];
+            sprintf(input_size_char, "%d", input_size);
+
+            char input_fd_char[20];
+            sprintf(input_fd_char, "%d", fd_unnamed[1]);
+
+            char *arg_list_producer[] = {"./producer_unnamed", input_size_char,input_fd_char, (char *)NULL};
+            int pid_producer = spawn("./producer_unnamed", arg_list_producer);
+
+            sprintf(input_fd_char, "%d", fd_unnamed[0]);
+
+            char *arg_list_consumer[] = {"./consumer_unnamed", input_size_char, input_fd_char, (char *)NULL};
+            int pid_consumer = spawn("./consumer_unnamed", arg_list_consumer);
+
+            int prod_status, cons_status;
+
+            fd_time_start = open(fifo_time_start, O_RDONLY);
+            fd_time_end = open(fifo_time_end, O_RDONLY);
+
+            waitpid(pid_producer_named, &prod_status, 0);
+            waitpid(pid_consumer_named, &cons_status, 0);
+
+            read(fd_time_start, &start, sizeof(start));
+            read(fd_time_end, &end, sizeof(end));
+
+            printf("Unnamed pipe took: %f milliseconds\n", end - start);
+
+            close(fd_time_start);
+            close(fd_time_end);
+
+            printf("\nProducer exited with status %d\n", prod_status);
+            printf("\nConsumer exited with status %d\n", cons_status);
+
+            unlink("/tmp/fifo_p_to_c");
+        }
+
+
+
+
         // if (command == 113)
         // {
         //     break;
