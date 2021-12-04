@@ -21,7 +21,8 @@ int pid_consumer_sockets;
 int pid_producer_shm;
 int pid_consumer_shm;
 int input_size;
-char *fifo_time = "/tmp/fifo_time";
+char *fifo_time_start = "/tmp/fifo_time_start";
+char *fifo_time_end = "/tmp/fifo_time_end";
 
 /* FUNCTIONS HEADERS */
 int spawn(const char *program, char **arg_list);
@@ -49,10 +50,10 @@ void create_fifo(const char *name)
     mkfifo(name, 0666);
 }
 
-float compute_time(struct timeval start, struct timeval end)
+double compute_time(struct timespec start, struct timespec end)
 {
 
-    float delta = 1000 * (end.tv_sec - start.tv_sec) + pow(10, -6) * (end.tv_usec - end.tv_usec);
+    double delta = 1000 * (end.tv_sec - start.tv_sec) + pow(10, -6) * (end.tv_nsec - end.tv_nsec);
     return delta;
 }
 
@@ -104,9 +105,12 @@ int interpreter()
 int main()
 {
 
-    create_fifo("/tmp/fifo_time");
-    int fd_time;
-    struct timeval start, end;
+    create_fifo("/tmp/fifo_time_start");
+    create_fifo("/tmp/fifo_time_end");
+    int fd_time_start, fd_time_end;
+
+    double start, end;
+    // long int start, end;
     while (1)
     {
         int command = interpreter();
@@ -123,18 +127,21 @@ int main()
             int prod_status, cons_status;
             waitpid(pid_producer_named, &prod_status, 0);
             waitpid(pid_consumer_named, &cons_status, 0);
-
-            printf("aaaaaaaa");
             fflush(stdout);
-            fd_time = open(fifo_time, O_RDONLY);
+            fd_time_start = open(fifo_time_start, O_RDONLY);
+            fd_time_end = open(fifo_time_end, O_RDONLY);
 
-            read(fd_time, &start, sizeof(struct timeval));
-            read(fd_time, &end, sizeof(struct timeval));
+            read(fd_time_start, &start, sizeof(start));
+            read(fd_time_end, &end, sizeof(end));
 
-            float delta = compute_time(start, end);
-            printf("Named pipe took: %f milliseconds\n", delta);
+            printf("master: start time is %f", start);
+            printf("master: end time is %f", end);
 
-            close(fd_time);
+            // double delta = compute_time(start, end);
+            printf("Named pipe took: %f seconds\n", end - start);
+
+            close(fd_time_start);
+            close(fd_time_end);
             printf("\nProducer exited with status %d\n", prod_status);
             printf("\nConsumer exited with status %d\n", cons_status);
 
