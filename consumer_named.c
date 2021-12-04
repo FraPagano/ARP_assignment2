@@ -9,29 +9,36 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include <time.h>
+/* Defining CHECK() tool. By using this methid the code results ligher and cleaner. */
+#define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stdout,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
 
-int fd;
+int fd, fd_time;
 char *fifo = "/tmp/fifo_p_to_c";
-struct timespec end;
+char *fifo_time = "/tmp/fifo_time";
+struct timeval end;
 
 int main(int argc, char *argv[])
 {
+    int data;
     const int size = atoi(argv[1]);
-    int data[size];
     fd = open(fifo, O_RDONLY);
 
     for (int i = 0; i < size; i++)
     {
-        read(fd, &data[i], sizeof(int));
+        read(fd, &data, sizeof(int));
+        printf(" %d ", data);
     }
 
-    clock_gettime(CLOCK_REALTIME, &end);
-    for (int i = 0; i < size; i++)
-    {
-        printf("%d", data[i]);
-        fflush(stdout);
-    }
+    gettimeofday(&end, NULL);
+    printf("aaaaaaaaa");
+    fflush(stdout);
+    fd_time = CHECK(open(fifo_time, O_WRONLY));
+    printf("bbbbbbbbb");
+    fflush(stdout);
+
+    write(fd_time, &end, sizeof(struct timeval));
     sleep(1);
     return 0;
 }

@@ -9,31 +9,51 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include <time.h>
+#define MAX 2000000
 
-int fd;
+int fd, fd_time;
 char *fifo = "/tmp/fifo_p_to_c";
-struct timespec start;
+char *fifo_time = "/tmp/fifo_time";
+struct timeval start;
 int main(int argc, char *argv[])
 {
-    const int size = atoi(argv[1]);
-    int data[size];
+    int size = atoi(argv[1]);
+    int data[MAX];
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < MAX; i++)
     {
         data[i] = rand() % 10;
     }
 
     fd = open(fifo, O_WRONLY);
 
-    clock_gettime(CLOCK_REALTIME, &start);
+    gettimeofday(&start, NULL);
+
+    int cycles = size / MAX;
+    for (int i = 0; i < cycles; i++)
+    {
+        for (int j = 0; j < MAX; j++)
+        {
+            write(fd, &data[j], sizeof(int));
+        }
+    }
+
+    size = size - cycles * MAX;
 
     for (int i = 0; i < size; i++)
     {
         write(fd, &data[i], sizeof(int));
     }
+    printf("bbbbbssss");
+    fflush(stdout);
+    fd_time = open(fifo_time, O_WRONLY);
+    printf("asssss");
+    fflush(stdout);
+    write(fd_time, &start, sizeof(struct timeval));
 
-    double time_start = 1000000000 * (start.tv_sec) + (start.tv_nsec);
     sleep(1);
+
     return 0;
 }

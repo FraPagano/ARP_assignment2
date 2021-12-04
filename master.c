@@ -10,6 +10,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <math.h>
 
 int pid_producer_named;
 int pid_consumer_named;
@@ -20,6 +21,7 @@ int pid_consumer_sockets;
 int pid_producer_shm;
 int pid_consumer_shm;
 int input_size;
+char *fifo_time = "/tmp/fifo_time";
 
 /* FUNCTIONS HEADERS */
 int spawn(const char *program, char **arg_list);
@@ -47,37 +49,54 @@ void create_fifo(const char *name)
     mkfifo(name, 0666);
 }
 
+float compute_time(struct timeval start, struct timeval end)
+{
+
+    float delta = 1000 * (end.tv_sec - start.tv_sec) + pow(10, -6) * (end.tv_usec - end.tv_usec);
+    return delta;
+}
+
 int interpreter()
 {
+    float data_size;
     int c;
-    printf("\nHow many numbers do you want to send?\n");
-    scanf("%d", &input_size);
-    printf("Choose a modality: \n");
-    printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n");
-    scanf("%d", &c);
-    fflush(stdout);
+    printf("\nInsert how many MB do you want to send or 'q' to quit\n");
+    scanf("%f", &data_size);
 
-    if (c == 1) // 1
+    if (data_size > 100)
     {
-        printf("Transfering data through named pipe...\n");
-        fflush(stdout);
-        return c;
-    }
-    else if (c == 2) // 2
-    {
-        printf("Transfer data through unnamed pipe\n");
-    }
-    else if (c == 3) // 3
-    {
-        printf("Transfer data through sockets\n");
-    }
-    else if (c == 4) // 4
-    {
-        printf("Transfer data through shared memory\n");
+        printf("Too many MB\n");
     }
     else
     {
-        printf("Please, use the commands above\n");
+        input_size = data_size * 250000;
+        printf("Choose a modality: \n");
+        printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n [q] for exiting\n");
+        scanf("%d", &c);
+        fflush(stdout);
+
+        if (c == 1) // 1
+        {
+            printf("Transfering data through named pipe...\n");
+            fflush(stdout);
+            return c;
+        }
+        else if (c == 2) // 2
+        {
+            printf("Transfer data through unnamed pipe\n");
+        }
+        else if (c == 3) // 3
+        {
+            printf("Transfer data through sockets\n");
+        }
+        else if (c == 4) // 4
+        {
+            printf("Transfer data through shared memory\n");
+        }
+        else
+        {
+            printf("Please, use the commands above\n");
+        }
     }
 }
 
@@ -85,6 +104,9 @@ int interpreter()
 int main()
 {
 
+    create_fifo("/tmp/fifo_time");
+    int fd_time;
+    struct timeval start, end;
     while (1)
     {
         int command = interpreter();
@@ -97,10 +119,33 @@ int main()
             pid_producer_named = spawn("./producer_named", arg_list_producer_named);
             char *arg_list_consumer_named[] = {"./consumer_named", input_size_char, (char *)NULL};
             pid_consumer_named = spawn("./consumer_named", arg_list_consumer_named);
-            wait(NULL);
+
+            int prod_status, cons_status;
+            waitpid(pid_producer_named, &prod_status, 0);
+            waitpid(pid_consumer_named, &cons_status, 0);
+
+            printf("aaaaaaaa");
+            fflush(stdout);
+            fd_time = open(fifo_time, O_RDONLY);
+
+            read(fd_time, &start, sizeof(struct timeval));
+            read(fd_time, &end, sizeof(struct timeval));
+
+            float delta = compute_time(start, end);
+            printf("Named pipe took: %f milliseconds\n", delta);
+
+            close(fd_time);
+            printf("\nProducer exited with status %d\n", prod_status);
+            printf("\nConsumer exited with status %d\n", cons_status);
+
+            unlink("/tmp/fifo_p_to_c");
         }
-        // if(command==2){}
+        if (command == 113)
+        {
+            break;
+        }
     }
-    unlink("/tmp/fifo_p_to_c");
+    unlink("/tmp/fifo_time");
+
     return 0;
 }
