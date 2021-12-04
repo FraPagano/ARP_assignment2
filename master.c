@@ -21,8 +21,6 @@ int pid_consumer_sockets;
 int pid_producer_shm;
 int pid_consumer_shm;
 int input_size;
-char *fifo_time_start = "/tmp/fifo_time_start";
-char *fifo_time_end = "/tmp/fifo_time_end";
 
 /* FUNCTIONS HEADERS */
 int spawn(const char *program, char **arg_list);
@@ -48,13 +46,6 @@ void create_fifo(const char *name)
 {
     /* Function to generate a named pipe. */
     mkfifo(name, 0666);
-}
-
-double compute_time(struct timespec start, struct timespec end)
-{
-
-    double delta = 1000 * (end.tv_sec - start.tv_sec) + pow(10, -6) * (end.tv_nsec - end.tv_nsec);
-    return delta;
 }
 
 int interpreter()
@@ -105,6 +96,8 @@ int interpreter()
 int main()
 {
 
+    char *fifo_time_start = "/tmp/fifo_time_start";
+    char *fifo_time_end = "/tmp/fifo_time_end";
     create_fifo("/tmp/fifo_time_start");
     create_fifo("/tmp/fifo_time_end");
     int fd_time_start, fd_time_end;
@@ -125,20 +118,16 @@ int main()
             pid_consumer_named = spawn("./consumer_named", arg_list_consumer_named);
 
             int prod_status, cons_status;
+            fd_time_start = open(fifo_time_start, O_RDONLY);
+            fd_time_end = open(fifo_time_end, O_RDONLY);
             waitpid(pid_producer_named, &prod_status, 0);
             waitpid(pid_consumer_named, &cons_status, 0);
             fflush(stdout);
-            fd_time_start = open(fifo_time_start, O_RDONLY);
-            fd_time_end = open(fifo_time_end, O_RDONLY);
 
             read(fd_time_start, &start, sizeof(start));
             read(fd_time_end, &end, sizeof(end));
 
-            printf("master: start time is %f", start);
-            printf("master: end time is %f", end);
-
-            // double delta = compute_time(start, end);
-            printf("Named pipe took: %f seconds\n", end - start);
+            printf("Named pipe took: %f milliseconds\n", end - start);
 
             close(fd_time_start);
             close(fd_time_end);
@@ -147,12 +136,13 @@ int main()
 
             unlink("/tmp/fifo_p_to_c");
         }
-        if (command == 113)
-        {
-            break;
-        }
+        // if (command == 113)
+        // {
+        //     break;
+        // }
     }
-    unlink("/tmp/fifo_time");
+    unlink("/tmp/fifo_time_start");
+    unlink("/tmp/fifo_time_end");
 
     return 0;
 }

@@ -29,14 +29,12 @@ int main(int argc, char *argv[])
     for (int i = 0; i < size; i++)
     {
         read(fd, &data, sizeof(int));
-        printf(" %d ", data);
+        // printf(" %d ", data);
     }
 
     clock_gettime(CLOCK_REALTIME, &end);
 
     double time_end = end.tv_sec * 1000 + end.tv_nsec * pow(10, -6);
-
-    printf("consumer: end time is: %f", time_end);
 
     fd_time_end = open(fifo_time_end, O_WRONLY);
 
