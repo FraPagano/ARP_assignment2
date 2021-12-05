@@ -45,43 +45,43 @@ void create_fifo(const char *name)
     mkfifo(name, 0666);
 }
 
-char interpreter()
+int interpreter()
 {
     
-    char c;
+    int c;
 
     while (1) {
 
         printf("Please, choose the data transmission modality: \n");
-        printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n [q] for exiting\n");
+        printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n [5] for exiting\n");
         fflush(stdout);
+        sleep(1);
+        scanf("%d", &c);
 
-        c = getchar();
-
-        if (c == '1') // 1
+        if (c == 1) // 1
         {
             printf("NAMED PIPE selected, ");
             fflush(stdout);
             break;
 
         }
-        else if (c == '2') // 2
+        else if (c == 2) // 2
         {
             printf("UNNAMED PIPE selected, ");
             break;
         }
-        else if (c == '3') // 3
+        else if (c == 3) // 3
         {
             printf("SOCKETS selected, ");
             break;
         }
-        else if (c == '4') // 4
+        else if (c == 4) // 4
         {
             printf("SHARED MEMORY selected, ");
             break;
         }
-        else if ( c == 'q' ) {
-            printf("EXIT selected.\n");
+        else if ( c == 5 ) {
+            printf("Exiting...\n");
             return c;
 
         }
@@ -106,6 +106,7 @@ char interpreter()
             break;
         }
     }
+
     return c;
 }
 
@@ -143,14 +144,17 @@ int main()
     // long int start, end;
     while (1)
     {
-        char command = interpreter();
+        int command = interpreter();
 
         char input_size_char[20];
         sprintf(input_size_char, "%d", input_size);
 
-        if (command == '1') // named pipe
+        if (command == 1) // named pipe
         {
             create_fifo("/tmp/fifo_p_to_c");
+
+            printf("Sending data...\n");
+            fflush(stdout);
 
             char *arg_list_producer_named[] = {"./producer_named", input_size_char, (char *)NULL};
             pid_producer = spawn("./producer_named", arg_list_producer_named);
@@ -164,13 +168,16 @@ int main()
 
             unlink("/tmp/fifo_p_to_c");
         }
-        if (command == '2') // unnamed pipe
+        if (command == 2) // unnamed pipe
         {
             int fd_unnamed[2];
             pipe(fd_unnamed);
 
             char input_fd_char[20];
             sprintf(input_fd_char, "%d", fd_unnamed[1]);
+
+            printf("Sending data...\n");
+            fflush(stdout);
 
             char *arg_list_producer[] = {"./producer_unnamed", input_size_char, input_fd_char, (char *)NULL};
             pid_producer = spawn("./producer_unnamed", arg_list_producer);
@@ -186,7 +193,7 @@ int main()
 
             unlink("/tmp/fifo_p_to_c");
         }
-        if ( command == 'q' ) {
+        if ( command == 5 ) {
             break;
         }
         sleep(1);
