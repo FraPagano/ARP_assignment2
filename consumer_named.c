@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <sys/socket.h>
 #define MAX 250000
 /* Defining CHECK() tool. By using this methid the code results ligher and cleaner. */
 #define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stdout,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })

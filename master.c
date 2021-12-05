@@ -47,10 +47,11 @@ void create_fifo(const char *name)
 
 int interpreter()
 {
-    
+
     int c;
 
-    while (1) {
+    while (1)
+    {
 
         printf("Please, choose the data transmission modality: \n");
         printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n [5] for exiting\n");
@@ -63,7 +64,6 @@ int interpreter()
             printf("NAMED PIPE selected, ");
             fflush(stdout);
             break;
-
         }
         else if (c == 2) // 2
         {
@@ -80,10 +80,10 @@ int interpreter()
             printf("SHARED MEMORY selected, ");
             break;
         }
-        else if ( c == 5 ) {
+        else if (c == 5)
+        {
             printf("Exiting...\n");
             return c;
-
         }
         else
         {
@@ -92,7 +92,8 @@ int interpreter()
         }
     }
 
-    while (1) {
+    while (1)
+    {
         printf("insert how many MB do you want to send: [float < 100] \n");
         fflush(stdout);
 
@@ -101,7 +102,9 @@ int interpreter()
         if (dataMB > 100)
         {
             printf("The number must be less then or equal 100.\n Please, ");
-        } else {
+        }
+        else
+        {
             input_size = dataMB * 250000;
             break;
         }
@@ -110,7 +113,8 @@ int interpreter()
     return c;
 }
 
-double closing_function () {
+double closing_function()
+{
 
     int prod_status, cons_status;
     int fd_time_start, fd_time_end;
@@ -131,7 +135,7 @@ double closing_function () {
     printf("Producer (PID = %d) exited with status %d\n", pid_producer, prod_status);
     printf("Consumer (PID = %d) exited with status %d\n", pid_consumer, cons_status);
 
-    return (end-start);
+    return (end - start);
 }
 
 /* MAIN */
@@ -164,7 +168,7 @@ int main()
 
             double time = closing_function();
 
-            printf("---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB );
+            printf("---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
             unlink("/tmp/fifo_p_to_c");
         }
@@ -189,7 +193,7 @@ int main()
 
             double time = closing_function();
 
-            printf("---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB );
+            printf("---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
             unlink("/tmp/fifo_p_to_c");
         }
@@ -197,18 +201,17 @@ int main()
         {
             printf("Sending data...\n");
             fflush(stdout);
-
-            char *arg_list_producer[] = {"./producer_socket", input_size_char, (char *)NULL};
-            pid_producer = spawn("./producer_socket", arg_list_producer);
-
-            char *arg_list_consumer[] = {"./consumer_socket", input_size_char, (char *)NULL};
+            char *arg_list_consumer[] = {"./consumer_socket", "5500", input_size_char, (char *)NULL};
             pid_consumer = spawn("./consumer_socket", arg_list_consumer);
+            char *arg_list_producer[] = {"./producer_socket", "localhost", "5500", input_size_char, (char *)NULL};
+            pid_producer = spawn("./producer_socket", arg_list_producer);
 
             double time = closing_function();
 
-            printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB );
+            printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
         }
-        if ( command == 5 ) {
+        if (command == 5)
+        {
             break;
         }
         sleep(1);
