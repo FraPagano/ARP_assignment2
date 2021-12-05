@@ -193,6 +193,21 @@ int main()
 
             unlink("/tmp/fifo_p_to_c");
         }
+        if (command == 3) // sockets
+        {
+            printf("Sending data...\n");
+            fflush(stdout);
+
+            char *arg_list_producer[] = {"./producer_socket", input_size_char, (char *)NULL};
+            pid_producer = spawn("./producer_socket", arg_list_producer);
+
+            char *arg_list_consumer[] = {"./consumer_socket", input_size_char, (char *)NULL};
+            pid_consumer = spawn("./consumer_socket", arg_list_consumer);
+
+            double time = closing_function();
+
+            printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB );
+        }
         if ( command == 5 ) {
             break;
         }

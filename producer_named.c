@@ -12,7 +12,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
-#define MAX 2000000
+#define MAX 250000
 
 int fd, fd_time_start;
 char *fifo = "/tmp/fifo_p_to_c";
@@ -38,20 +38,15 @@ int main(int argc, char *argv[])
 
     write(fd_time_start, &time_start, sizeof(time_start));
 
-    int cycles = size / MAX;
-    for (int i = 0; i < cycles; i++)
-    {
-        for (int j = 0; j < MAX; j++)
-        {
-            write(fd, &data[j], sizeof(int));
-        }
-    }
-
-    size = size - cycles * MAX;
-
     for (int i = 0; i < size; i++)
     {
         write(fd, &data[i], sizeof(int));
+
+        if (i == MAX)
+        {
+            size = size - MAX;
+            i = 0;
+        }
     }
 
     sleep(1);
