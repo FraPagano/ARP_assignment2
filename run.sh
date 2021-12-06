@@ -1,4 +1,4 @@
-gcc master.c -lrt -o master
+gcc master.c -lrt -pthread -o master
 gcc consumer_named.c -o consumer_named
 gcc producer_named.c -o producer_named
 gcc consumer_unnamed.c -o consumer_unnamed

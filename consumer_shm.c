@@ -11,59 +11,51 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <math.h>
-#define SEM_PATH_MUTEX "/sem_mutex"
-#define SEM_PATH_NOT_FULL "/sem_not_full"
-#define SEM_PATH_NOT_EMPTY "/sem_not_empty"
+#define SNAME_MUTEX "/sem_mutex"
+#define SNAME_NOTFULL "/sem_not_full"
+#define SNAME_NOTEMPTY "/sem_not_empty"
+#define SHM_PATH "/shm"
 #define SIZE 1000
 #define MAX 250000
 
 int main(int argc, char *argv[])
 {
     int size = atoi(argv[1]);
-    int shm_fd = atoi(argv[2]);
     struct timespec end;
     char *fifo_time_end = "/tmp/fifo_time_end";
     int fd_time_end;
+
+    int shm_fd = shm_open(SHM_PATH, O_RDONLY, 0666);
     void *shm_ptr = mmap(NULL, SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
-    printf("dgdgd");
-    fflush(stdout);
-    sem_t *mutex = sem_open(SEM_PATH_MUTEX, O_CREAT, S_IRUSR | S_IWUSR, 1);
-    sem_t *NotFull = sem_open(SEM_PATH_NOT_FULL, O_CREAT, S_IRUSR | S_IWUSR, 249);
-    sem_t *NotEmpty = sem_open(SEM_PATH_NOT_EMPTY, O_CREAT, S_IRUSR | S_IWUSR, 0);
-    printf("qqqq");
-    fflush(stdout);
+
+    sem_t *mutex = sem_open(SNAME_MUTEX, 0);
+    sem_t *NotFull = sem_open(SNAME_NOTFULL, 0);
+    sem_t *NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
+
     int data;
-    int B[size];
+    int B[MAX];
     int j = 0;
 
     for (int i = 0; i < size; i++)
     {
-        printf("eee");
-        fflush(stdout);
         sem_wait(NotEmpty);
-        printf("fff");
-        fflush(stdout);
         sem_wait(mutex);
-        printf("ggg");
-        fflush(stdout);
 
-        data = ((int *)shm_ptr)[j];
+        memcpy( &data, &(((int *)shm_ptr)[j]), sizeof(int) );
         B[i] = data;
-        j = (j + 1) % SIZE;
+        j = (j + 1) % 250;
 
         sem_post(mutex);
-        printf("hhhh");
-        fflush(stdout);
         sem_post(NotFull);
-        printf("iii");
-        fflush(stdout);
 
         if (i == MAX)
         {
             size = size - MAX;
             i = 0;
+            printf("resetted");
         }
     }
+
     clock_gettime(CLOCK_REALTIME, &end);
 
     double time_end = end.tv_sec * 1000 + end.tv_nsec * pow(10, -6);

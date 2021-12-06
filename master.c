@@ -13,11 +13,11 @@
 #include <math.h>
 #include <semaphore.h>
 #include <sys/mman.h>
-//#include <sys/shm.h>
+
 #define SIZE 1000
-#define SEM_PATH_MUTEX "/sem_mutex"
-#define SEM_PATH_NOT_FULL "/sem_not_full"
-#define SEM_PATH_NOT_EMPTY "/sem_not_empty"
+#define SNAME_MUTEX "/sem_mutex"
+#define SNAME_NOTFULL "/sem_not_full"
+#define SNAME_NOTEMPTY "/sem_not_empty"
 #define SHM_PATH "/shm"
 
 int pid_producer;
@@ -226,18 +226,27 @@ int main()
             int shm_fd = shm_open(SHM_PATH, O_CREAT | O_RDWR, 0666);
             ftruncate(shm_fd, SIZE);
 
-            char shm_fd_char[20];
-            sprintf(shm_fd_char, "%d", shm_fd);
+            sem_t * mutex = sem_open(SNAME_MUTEX, O_CREAT, 0644, 1);
+            sem_t * NotFull = sem_open(SNAME_NOTFULL, O_CREAT, 0644, 249);
+            sem_t * NotEmpty = sem_open(SNAME_NOTEMPTY, O_CREAT, 0644, 0);
 
-            char *arg_list_consumer[] = {"./consumer_shm", input_size_char, shm_fd_char, (char *)NULL};
-            pid_consumer = spawn("./consumer_shm", arg_list_consumer);
-
-            char *arg_list_producer[] = {"./producer_shm", input_size_char, shm_fd_char, (char *)NULL};
+            char *arg_list_producer[] = {"./producer_shm", input_size_char, (char *)NULL};
             pid_producer = spawn("./producer_shm", arg_list_producer);
 
+            char *arg_list_consumer[] = {"./consumer_shm", input_size_char, (char *)NULL};
+            pid_consumer = spawn("./consumer_shm", arg_list_consumer);
+
             double time = closing_function();
-            printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf("---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
             shm_unlink(SHM_PATH);
+
+            sem_close(mutex);
+            sem_close(NotFull);
+            sem_close(NotEmpty);
+
+            sem_unlink(SNAME_MUTEX);
+            sem_unlink(SNAME_NOTFULL);
+            sem_unlink(SNAME_NOTEMPTY);
         }
 
         if (command == 5)

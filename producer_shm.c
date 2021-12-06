@@ -11,29 +11,31 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <math.h>
-#define SEM_PATH_MUTEX "/sem_mutex"
-#define SEM_PATH_NOT_FULL "/sem_not_full"
-#define SEM_PATH_NOT_EMPTY "/sem_not_empty"
+#define SNAME_MUTEX "/sem_mutex"
+#define SNAME_NOTFULL "/sem_not_full"
+#define SNAME_NOTEMPTY "/sem_not_empty"
+#define SHM_PATH "/shm"
 #define SIZE 1000
 #define MAX 250000
 
 int main(int argc, char *argv[])
 {
     int size = atoi(argv[1]);
-    int shm_fd = atoi(argv[2]);
     int fd_time_start;
     struct timespec start;
     char *fifo_time_start = "/tmp/fifo_time_start";
-    sem_t *mutex = sem_open(SEM_PATH_MUTEX, O_CREAT, S_IRUSR | S_IWUSR, 1);
-    sem_t *NotFull = sem_open(SEM_PATH_NOT_FULL, O_CREAT, S_IRUSR | S_IWUSR, 249);
-    sem_t *NotEmpty = sem_open(SEM_PATH_NOT_EMPTY, O_CREAT, S_IRUSR | S_IWUSR, 0);
+    sem_t * mutex = sem_open(SNAME_MUTEX, 0);
+    sem_t * NotFull = sem_open(SNAME_NOTFULL, 0);
+    sem_t * NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
 
-    int data[size];
+    int data[MAX];
     int j = 0;
     /*the mmap() funciton establishes a memory-mapped file containing the shared memory object. It also
     returns a pointer to the memory-mapped file that is used for accessing the shared memory object.
     */
-    void *shm_ptr = mmap(NULL, SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
+
+    int shm_fd = shm_open(SHM_PATH, O_RDWR, 0666);
+    void *shm_ptr = mmap(NULL, SIZE, PROT_WRITE , MAP_SHARED, shm_fd, 0);
 
     for (int i = 0; i < MAX; i++)
     {
@@ -44,24 +46,18 @@ int main(int argc, char *argv[])
     double time_start = start.tv_sec * 1000 + start.tv_nsec * pow(10, -6);
     write(fd_time_start, &time_start, sizeof(time_start));
 
+    // sem_post(mutex);
+
     for (int i = 0; i < size; i++)
     {
         sem_wait(NotFull);
-        printf("aaa");
-        fflush(stdout);
-        // sem_wait(mutex);
-        printf("bbb");
-        fflush(stdout);
+        sem_wait(mutex);
 
-        //((int *)shm_ptr)[j] = data[i];
-        j = (j + 1) % SIZE;
+        memcpy( &(((int *)shm_ptr)[j]), &(data[i]), sizeof(int) );
+        j = (j + 1) % 250;
 
-        // sem_post(mutex);
-        printf("ccc");
-        fflush(stdout);
+        sem_post(mutex);
         sem_post(NotEmpty);
-        printf("ddd");
-        fflush(stdout);
 
         if (i == MAX)
         {
