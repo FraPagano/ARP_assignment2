@@ -7,42 +7,68 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/shm.h>
+#include <semaphore.h>
+#include <sys/mman.h>
+#include <time.h>
+#include <math.h>
+#define SEM_PATH_MUTEX "/sem_mutex"
+#define SEM_PATH_NOT_FULL "/sem_not_full"
+#define SEM_PATH_NOT_EMPTY "/sem_not_empty"
+#define SIZE 1000
+#define MAX 250000
 
-int main()
+int main(int argc, char *argv[])
 {
-    const char *SH_MEM_OBJ = "/shm_AOS";
-    const int SIZE = 4096;
+    int size = atoi(argv[1]);
+    int shm_fd = atoi(argv[2]);
+    int fd_time_start;
+    struct timespec start;
+    char *fifo_time_start = "/tmp/fifo_time_start";
+    sem_t *mutex = sem_open(SEM_PATH_MUTEX, O_CREAT, S_IRUSR | S_IWUSR, 1);
+    sem_t *NotFull = sem_open(SEM_PATH_NOT_FULL, O_CREAT, S_IRUSR | S_IWUSR, 249);
+    sem_t *NotEmpty = sem_open(SEM_PATH_NOT_EMPTY, O_CREAT, S_IRUSR | S_IWUSR, 0);
 
-    float out[1000000];
-    // memset(out, 0, sizeof(out));
-
-    for (int i = 0; i < 1000000; i++)
-    {
-        out[i] = rand();
-    }
-    int i = 0;
-
-    int shm_fd = shm_open(SH_MEM_OBJ, O_CREAT | O_RDWR, 0666);
-
-    ftruncate(shm_fd, SIZE);
-    // La share memory aperta diventa esattamente di size shared_memory_size
-
+    int data[size];
+    int j = 0;
     /*the mmap() funciton establishes a memory-mapped file containing the shared memory object. It also
     returns a pointer to the memory-mapped file that is used for accessing the shared memory object.
     */
-    void *sh_out = mmap(NULL, SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
+    void *shm_ptr = mmap(NULL, SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
-    // printf("Il primo elemento di out e': %f\n", out[0]);
-
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX; i++)
     {
+        data[i] = rand() % 10;
+    }
+    fd_time_start = open(fifo_time_start, O_WRONLY);
+    clock_gettime(CLOCK_REALTIME, &start);
+    double time_start = start.tv_sec * 1000 + start.tv_nsec * pow(10, -6);
+    write(fd_time_start, &time_start, sizeof(time_start));
 
-        *(int *)sh_out = i;
-        sh_out += sizeof(int);
+    for (int i = 0; i < size; i++)
+    {
+        sem_wait(NotFull);
+        printf("aaa");
+        fflush(stdout);
+        // sem_wait(mutex);
+        printf("bbb");
+        fflush(stdout);
 
-        sleep(1);
+        //((int *)shm_ptr)[j] = data[i];
+        j = (j + 1) % SIZE;
+
+        // sem_post(mutex);
+        printf("ccc");
+        fflush(stdout);
+        sem_post(NotEmpty);
+        printf("ddd");
+        fflush(stdout);
+
+        if (i == MAX)
+        {
+            size = size - MAX;
+            i = 0;
+        }
     }
 
-    shm_unlink(SH_MEM_OBJ);
     return 0;
 }

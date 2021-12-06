@@ -11,6 +11,14 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <math.h>
+#include <semaphore.h>
+#include <sys/mman.h>
+//#include <sys/shm.h>
+#define SIZE 1000
+#define SEM_PATH_MUTEX "/sem_mutex"
+#define SEM_PATH_NOT_FULL "/sem_not_full"
+#define SEM_PATH_NOT_EMPTY "/sem_not_empty"
+#define SHM_PATH "/shm"
 
 int pid_producer;
 int pid_consumer;
@@ -210,6 +218,28 @@ int main()
 
             printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
         }
+        if (command == 4)
+        {
+            printf("Sending data...\n");
+            fflush(stdout);
+
+            int shm_fd = shm_open(SHM_PATH, O_CREAT | O_RDWR, 0666);
+            ftruncate(shm_fd, SIZE);
+
+            char shm_fd_char[20];
+            sprintf(shm_fd_char, "%d", shm_fd);
+
+            char *arg_list_consumer[] = {"./consumer_shm", input_size_char, shm_fd_char, (char *)NULL};
+            pid_consumer = spawn("./consumer_shm", arg_list_consumer);
+
+            char *arg_list_producer[] = {"./producer_shm", input_size_char, shm_fd_char, (char *)NULL};
+            pid_producer = spawn("./producer_shm", arg_list_producer);
+
+            double time = closing_function();
+            printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            shm_unlink(SHM_PATH);
+        }
+
         if (command == 5)
         {
             break;

@@ -7,34 +7,70 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/shm.h>
+#include <semaphore.h>
+#include <sys/mman.h>
+#include <time.h>
+#include <math.h>
+#define SEM_PATH_MUTEX "/sem_mutex"
+#define SEM_PATH_NOT_FULL "/sem_not_full"
+#define SEM_PATH_NOT_EMPTY "/sem_not_empty"
+#define SIZE 1000
+#define MAX 250000
 
-int main()
+int main(int argc, char *argv[])
 {
-    const char *SH_MEM_OBJ = "/shm_AOS";
-    const int SIZE = 4096;
-    int shared_segment_size = sizeof(float) * 1;
-    int shm_fd = shm_open(SH_MEM_OBJ, O_RDONLY, 0666);
-    /*SHARED MEMORY START*/
-    void *sh_in = mmap(NULL, SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
+    int size = atoi(argv[1]);
+    int shm_fd = atoi(argv[2]);
+    struct timespec end;
+    char *fifo_time_end = "/tmp/fifo_time_end";
+    int fd_time_end;
+    void *shm_ptr = mmap(NULL, SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
+    printf("dgdgd");
+    fflush(stdout);
+    sem_t *mutex = sem_open(SEM_PATH_MUTEX, O_CREAT, S_IRUSR | S_IWUSR, 1);
+    sem_t *NotFull = sem_open(SEM_PATH_NOT_FULL, O_CREAT, S_IRUSR | S_IWUSR, 249);
+    sem_t *NotEmpty = sem_open(SEM_PATH_NOT_EMPTY, O_CREAT, S_IRUSR | S_IWUSR, 0);
+    printf("qqqq");
+    fflush(stdout);
+    int data;
+    int B[size];
+    int j = 0;
 
-    // float in[1000000];
-    // memset(in, 0, sizeof(in));
-    // int i = 0;
-
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < size; i++)
     {
-        // memcpy(&in[i], sh_in, sizeof(float));
-
-        printf("%d", *((int *)sh_in));
+        printf("eee");
         fflush(stdout);
-        sh_in += sizeof(int);
-        // sprintf(sh_in, "%f", in[i]);
-        // printf("I read the %d float of in: %s\n", i, (char *)sh_in);
-        // i++;
-        sleep(1);
+        sem_wait(NotEmpty);
+        printf("fff");
+        fflush(stdout);
+        sem_wait(mutex);
+        printf("ggg");
+        fflush(stdout);
+
+        data = ((int *)shm_ptr)[j];
+        B[i] = data;
+        j = (j + 1) % SIZE;
+
+        sem_post(mutex);
+        printf("hhhh");
+        fflush(stdout);
+        sem_post(NotFull);
+        printf("iii");
+        fflush(stdout);
+
+        if (i == MAX)
+        {
+            size = size - MAX;
+            i = 0;
+        }
     }
-    shm_unlink(SH_MEM_OBJ);
-    /*SHARED MEMORY END*/
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    double time_end = end.tv_sec * 1000 + end.tv_nsec * pow(10, -6);
+
+    fd_time_end = open(fifo_time_end, O_WRONLY);
+
+    write(fd_time_end, &time_end, sizeof(time_end));
 
     return 0;
 }
