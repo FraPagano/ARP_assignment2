@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     // sockfd and newsockfd are file descriptors. portno stores the port number on which the server accepts connections
     // n is the return value for the read() and write() calls; i.e. it contains the number of characters read or written.
     int sockfd, newsockfd, portno, clilen, fd_time_end;
-    int size = atoi(argv[2]);
+    int noelement_to_read = atoi(argv[2]);
     int B[MAX];
     int data;
     struct timespec end;
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     if (newsockfd < 0)
         error("ERROR on accept");
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < noelement_to_read; i++)
     {
         read(newsockfd, &data, sizeof(int));
 
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 
         if (i == MAX)
         {
-            size = size - MAX;
+            noelement_to_read = noelement_to_read - MAX;
             i = 0;
         }
     }

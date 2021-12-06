@@ -20,8 +20,7 @@ struct timespec start;
 
 int main(int argc, char *argv[])
 {
-    int size = atoi(argv[1]);
-    printf("size1: %d\n", size);
+    int noelement_to_send = atoi(argv[1]);
     fd = atoi(argv[2]);
     int data[MAX];
 
@@ -37,12 +36,12 @@ int main(int argc, char *argv[])
 
     write(fd_time_start, &time_start, sizeof(time_start));
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < noelement_to_send; i++)
     {
         write(fd, &data[i], sizeof(int));
         if (i == MAX)
         {
-            size = size - MAX;
+            noelement_to_send = noelement_to_send - MAX;
             i = 0;
         }
     }

@@ -22,7 +22,7 @@
 
 int pid_producer;
 int pid_consumer;
-int input_size;
+int noelement;
 float dataMB;
 char *fifo_time_start = "/tmp/fifo_time_start";
 char *fifo_time_end = "/tmp/fifo_time_end";
@@ -62,28 +62,27 @@ int interpreter()
     {
 
         printf("Please, choose the data transmission modality: \n");
-        printf(" [1] Named pipe \n [2] unnamed pipe \n [3] sockets \n [4] shared memory \n [5] for exiting\n");
+        printf(" [1] Named pipe \n [2] Unnamed pipe \n [3] Sockets \n [4] Shared memory \n [5] For exiting\n");
         fflush(stdout);
-        sleep(1);
-        scanf("%d", &c);
+        scanf(" %d", &c);
 
-        if (c == 1) // 1
+        if (c == 1)
         {
             printf("NAMED PIPE selected, ");
             fflush(stdout);
             break;
         }
-        else if (c == 2) // 2
+        else if (c == 2)
         {
             printf("UNNAMED PIPE selected, ");
             break;
         }
-        else if (c == 3) // 3
+        else if (c == 3)
         {
             printf("SOCKETS selected, ");
             break;
         }
-        else if (c == 4) // 4
+        else if (c == 4)
         {
             printf("SHARED MEMORY selected, ");
             break;
@@ -97,12 +96,13 @@ int interpreter()
         {
             printf("Please, use the commands above.\n");
             fflush(stdout);
+            fgetc(stdin);
         }
     }
 
     while (1)
     {
-        printf("insert how many MB do you want to send: [float < 100] \n");
+        printf("Insert how many MB do you want to send: [float < 100] \n");
         fflush(stdout);
 
         scanf("%f", &dataMB);
@@ -113,7 +113,7 @@ int interpreter()
         }
         else
         {
-            input_size = dataMB * 250000;
+            noelement = dataMB * 250000;
             break;
         }
     }
@@ -158,8 +158,8 @@ int main()
     {
         int command = interpreter();
 
-        char input_size_char[20];
-        sprintf(input_size_char, "%d", input_size);
+        char noelement_char[20];
+        sprintf(noelement_char, "%d", noelement);
 
         if (command == 1) // named pipe
         {
@@ -168,10 +168,10 @@ int main()
             printf("Sending data...\n");
             fflush(stdout);
 
-            char *arg_list_producer_named[] = {"./producer_named", input_size_char, (char *)NULL};
+            char *arg_list_producer_named[] = {"./producer_named", noelement_char, (char *)NULL};
             pid_producer = spawn("./producer_named", arg_list_producer_named);
 
-            char *arg_list_consumer_named[] = {"./consumer_named", input_size_char, (char *)NULL};
+            char *arg_list_consumer_named[] = {"./consumer_named", noelement_char, (char *)NULL};
             pid_consumer = spawn("./consumer_named", arg_list_consumer_named);
 
             double time = closing_function();
@@ -191,12 +191,12 @@ int main()
             printf("Sending data...\n");
             fflush(stdout);
 
-            char *arg_list_producer[] = {"./producer_unnamed", input_size_char, input_fd_char, (char *)NULL};
+            char *arg_list_producer[] = {"./producer_unnamed", noelement_char, input_fd_char, (char *)NULL};
             pid_producer = spawn("./producer_unnamed", arg_list_producer);
 
             sprintf(input_fd_char, "%d", fd_unnamed[0]);
 
-            char *arg_list_consumer[] = {"./consumer_unnamed", input_size_char, input_fd_char, (char *)NULL};
+            char *arg_list_consumer[] = {"./consumer_unnamed", noelement_char, input_fd_char, (char *)NULL};
             pid_consumer = spawn("./consumer_unnamed", arg_list_consumer);
 
             double time = closing_function();
@@ -207,11 +207,18 @@ int main()
         }
         if (command == 3) // sockets
         {
+
+            int portno;
+            printf("Insert the port number:\n");
+            scanf("%d", &portno);
+            char portno_char[30];
+            sprintf(portno_char, "%d", portno);
             printf("Sending data...\n");
             fflush(stdout);
-            char *arg_list_consumer[] = {"./consumer_socket", "5500", input_size_char, (char *)NULL};
+
+            char *arg_list_consumer[] = {"./consumer_socket", portno_char, noelement_char, (char *)NULL};
             pid_consumer = spawn("./consumer_socket", arg_list_consumer);
-            char *arg_list_producer[] = {"./producer_socket", "localhost", "5500", input_size_char, (char *)NULL};
+            char *arg_list_producer[] = {"./producer_socket", "localhost", portno_char, noelement_char, (char *)NULL};
             pid_producer = spawn("./producer_socket", arg_list_producer);
 
             double time = closing_function();
@@ -226,18 +233,19 @@ int main()
             int shm_fd = shm_open(SHM_PATH, O_CREAT | O_RDWR, 0666);
             ftruncate(shm_fd, SIZE);
 
-            sem_t * mutex = sem_open(SNAME_MUTEX, O_CREAT, 0644, 1);
-            sem_t * NotFull = sem_open(SNAME_NOTFULL, O_CREAT, 0644, 249);
-            sem_t * NotEmpty = sem_open(SNAME_NOTEMPTY, O_CREAT, 0644, 0);
+            sem_t *mutex = sem_open(SNAME_MUTEX, O_CREAT, 0644, 1);
+            sem_t *NotFull = sem_open(SNAME_NOTFULL, O_CREAT, 0644, 249);
+            sem_t *NotEmpty = sem_open(SNAME_NOTEMPTY, O_CREAT, 0644, 0);
 
-            char *arg_list_producer[] = {"./producer_shm", input_size_char, (char *)NULL};
+            char *arg_list_producer[] = {"./producer_shm", noelement_char, (char *)NULL};
             pid_producer = spawn("./producer_shm", arg_list_producer);
 
-            char *arg_list_consumer[] = {"./consumer_shm", input_size_char, (char *)NULL};
+            char *arg_list_consumer[] = {"./consumer_shm", noelement_char, (char *)NULL};
             pid_consumer = spawn("./consumer_shm", arg_list_consumer);
 
             double time = closing_function();
             printf("---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+
             shm_unlink(SHM_PATH);
 
             sem_close(mutex);

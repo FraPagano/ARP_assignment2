@@ -15,27 +15,29 @@
 #define SNAME_NOTFULL "/sem_not_full"
 #define SNAME_NOTEMPTY "/sem_not_empty"
 #define SHM_PATH "/shm"
-#define SIZE 1000
+#define CBUFFER_SIZE 1000
 #define MAX 250000
+#define BUFFER_NOELEMENT 250
 
 int main(int argc, char *argv[])
 {
-    int size = atoi(argv[1]);
+    int noelement_to_send = atoi(argv[1]);
     int fd_time_start;
     struct timespec start;
     char *fifo_time_start = "/tmp/fifo_time_start";
-    sem_t * mutex = sem_open(SNAME_MUTEX, 0);
-    sem_t * NotFull = sem_open(SNAME_NOTFULL, 0);
-    sem_t * NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
+
+    sem_t *mutex = sem_open(SNAME_MUTEX, 0);
+    sem_t *NotFull = sem_open(SNAME_NOTFULL, 0);
+    sem_t *NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
 
     int data[MAX];
-    int j = 0;
+    int head = 0;
     /*the mmap() funciton establishes a memory-mapped file containing the shared memory object. It also
     returns a pointer to the memory-mapped file that is used for accessing the shared memory object.
     */
 
     int shm_fd = shm_open(SHM_PATH, O_RDWR, 0666);
-    void *shm_ptr = mmap(NULL, SIZE, PROT_WRITE , MAP_SHARED, shm_fd, 0);
+    void *shm_ptr = mmap(NULL, CBUFFER_SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
     for (int i = 0; i < MAX; i++)
     {
@@ -48,20 +50,20 @@ int main(int argc, char *argv[])
 
     // sem_post(mutex);
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < noelement_to_send; i++)
     {
         sem_wait(NotFull);
         sem_wait(mutex);
 
-        memcpy( &(((int *)shm_ptr)[j]), &(data[i]), sizeof(int) );
-        j = (j + 1) % 250;
+        memcpy(&(((int *)shm_ptr)[head]), &(data[i]), sizeof(int));
+        head = (head + 1) % BUFFER_NOELEMENT;
 
         sem_post(mutex);
         sem_post(NotEmpty);
 
         if (i == MAX)
         {
-            size = size - MAX;
+            noelement_to_send = noelement_to_send - MAX;
             i = 0;
         }
     }

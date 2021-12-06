@@ -26,10 +26,10 @@ int B[MAX];
 int main(int argc, char *argv[])
 {
     int data;
-    int size = atoi(argv[1]);
+    int noelement_to_read = atoi(argv[1]);
     fd = open(fifo, O_RDONLY);
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < noelement_to_read; i++)
     {
         read(fd, &data, sizeof(int));
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
         if (i == MAX)
         {
-            size = size - MAX;
+            noelement_to_read = noelement_to_read - MAX;
             i = 0;
         }
     }

@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     }
 
     portno = atoi(argv[2]);
-    int size = atoi(argv[3]);
+    int noelement_to_send = atoi(argv[3]);
     int data[MAX];
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -87,13 +87,13 @@ int main(int argc, char *argv[])
     double time_start = start.tv_sec * 1000 + start.tv_nsec * pow(10, -6);
     write(fd_time_start, &time_start, sizeof(time_start));
 
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < noelement_to_send; i++)
     {
         write(sockfd, &data[i], sizeof(int));
 
         if (i == MAX)
         {
-            size = size - MAX;
+            noelement_to_send = noelement_to_send - MAX;
             i = 0;
         }
     }
