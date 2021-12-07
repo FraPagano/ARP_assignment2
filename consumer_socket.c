@@ -1,48 +1,27 @@
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <signal.h>
 #include <string.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <sys/time.h>
-#include <math.h>
-#define MAX 250000
-void error(char *msg)
-{
-    perror(msg);
-    exit(1);
-}
+#include <netdb.h>
+
+#include "paramethers.h"
 
 int main(int argc, char *argv[])
 {
     // sockfd and newsockfd are file descriptors. portno stores the port number on which the server accepts connections
     // n is the return value for the read() and write() calls; i.e. it contains the number of characters read or written.
-    int sockfd, newsockfd, portno, clilen, fd_time_end;
+    int sockfd, newsockfd, clilen, B[MAX], data;
+
+    int portno = atoi(argv[1]);
     int noelement_to_read = atoi(argv[2]);
-    int B[MAX];
-    int data;
-    struct timespec end;
-    char *fifo_time_end = "/tmp/fifo_time_end";
+
     // A sockaddr_in is a structure containing an internet address. This structure is defined in <netinet/in.h>
     // The variable serv_addr will contain the address of the server, and cli_addr will contain the
     // address of the client which connects to the server
 
     struct sockaddr_in serv_addr, cli_addr;
-
-    struct sockaddr_in
-    {
-        short sin_family;
-        u_short sin_port;
-        struct in_addr sin_addr;
-        char sin_zero[8];
-    };
 
     // The user needs to pass in the port number on which the server will accept connections as an argument. This
     // code displays an error message if the user fails to do this.
@@ -61,10 +40,7 @@ int main(int argc, char *argv[])
     protocol. If this argument is zero (and it always should be except for unusual circumstances), the operating
     system will choose the most appropriate protocol. It will choose TCP for stream sockets and UDP for
     datagram sockets.*/
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (sockfd < 0)
-        error("ERROR opening socket");
+    sockfd = CHECK(socket(AF_INET, SOCK_STREAM, 0));
 
     // The function bzero() sets all values in a buffer to zero. It takes two arguments, the first is a pointer to the
     // buffer and the second is the size of the buffer. Thus, this line initializes serv_addr to zeros.
@@ -72,7 +48,7 @@ int main(int argc, char *argv[])
 
     // The port number on which the server will listen for connections is passed in as an argument, and this
     // statement uses the atoi() function to convert this from a string of digits to an integer
-    portno = atoi(argv[1]);
+    
 
     // he variable serv_addr is a structure of type struct sockaddr_in. This structure has four fields. The first
     // field is short sin_family, which contains a code for the address family. It should always be set to the
@@ -96,8 +72,7 @@ int main(int argc, char *argv[])
     // type sockaddr, but what is passed in is a structure of type sockaddr_in, and so this must be cast to the
     // correct type. This can fail for a number of reasons, the most obvious being that this socket is already in use
     // on this machine.
-    if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-        error("ERROR on binding");
+    CHECK(bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)));
 
     // The listen system call allows the process to listen on the socket for connections. The first argument is the
     // socket file descriptor, and the second is the size of the backlog queue, i.e., the number of connections that
@@ -112,7 +87,7 @@ int main(int argc, char *argv[])
     // second argument is a reference pointer to the address of the client on the other end of the connection, and the
     // third argument is the size of this structure.
     clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+    newsockfd = CHECK (accept(sockfd, (struct sockaddr *)&cli_addr, &clilen));
 
     // Note that we would only get to this point after a client has successfully connected to our server. This code
     // initializes the buffer using the bzero() function, and then reads from the socket. Note that the read call uses
@@ -120,8 +95,6 @@ int main(int argc, char *argv[])
     // Note also that the read() will block until there is something for it to read in the socket, i.e. after the client
     // has executed a write(). It will read either the total number of characters in the socket or 255, whichever is
     // less, and return the number of characters read.
-    if (newsockfd < 0)
-        error("ERROR on accept");
 
     for (int i = 0; i < noelement_to_read; i++)
     {
@@ -135,16 +108,12 @@ int main(int argc, char *argv[])
             i = 0;
         }
     }
-    clock_gettime(CLOCK_REALTIME, &end);
+    send_end_time();
 
-    double time_end = end.tv_sec * 1000 + end.tv_nsec * pow(10, -6);
-
-    fd_time_end = open(fifo_time_end, O_WRONLY);
-
-    write(fd_time_end, &time_end, sizeof(time_end));
     // Once a connection has been established, both ends can both read and write to the connection. Naturally,
     // everything written by the client will be read by the server, and everything written by the server will be read
     // by the client. This code simply writes a short message to the client.
-
+    sleep(1);
+    close(sockfd);
     return 0;
 }

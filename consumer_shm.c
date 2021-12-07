@@ -1,41 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <string.h>
 #include <unistd.h>
-#include <sys/shm.h>
+#include <string.h>
 #include <semaphore.h>
 #include <sys/mman.h>
-#include <time.h>
-#include <math.h>
-#define SNAME_MUTEX "/sem_mutex"
-#define SNAME_NOTFULL "/sem_not_full"
-#define SNAME_NOTEMPTY "/sem_not_empty"
-#define SHM_PATH "/shm"
-#define CBUFFER_SIZE 1000
-#define MAX 250000
-#define BUFFER_NOELEMENT 250
+
+#include "paramethers.h"
 
 int main(int argc, char *argv[])
 {
-    int noelement_to_read = atoi(argv[1]);
-    struct timespec end;
-    char *fifo_time_end = "/tmp/fifo_time_end";
-    int fd_time_end;
+    int data, B[MAX];
+    int tail = 0;
 
-    int shm_fd = shm_open(SHM_PATH, O_RDONLY, 0666);
+    int noelement_to_read = atoi(argv[1]);
+
+    int shm_fd = shm_open(SHM_NAME, O_RDONLY, 0666);
     void *shm_ptr = mmap(NULL, CBUFFER_SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
 
     sem_t *mutex = sem_open(SNAME_MUTEX, 0);
     sem_t *NotFull = sem_open(SNAME_NOTFULL, 0);
     sem_t *NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
-
-    int data;
-    int B[MAX];
-    int tail = 0;
 
     for (int i = 0; i < noelement_to_read; i++)
     {
@@ -53,17 +39,11 @@ int main(int argc, char *argv[])
         {
             noelement_to_read = noelement_to_read - MAX;
             i = 0;
-            // printf("resetted");
         }
     }
 
-    clock_gettime(CLOCK_REALTIME, &end);
-
-    double time_end = end.tv_sec * 1000 + end.tv_nsec * pow(10, -6);
-
-    fd_time_end = open(fifo_time_end, O_WRONLY);
-
-    write(fd_time_end, &time_end, sizeof(time_end));
-
+    send_end_time();
+    sleep(1);
+    close(shm_fd);
     return 0;
 }

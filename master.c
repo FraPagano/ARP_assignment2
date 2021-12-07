@@ -3,35 +3,27 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <signal.h>
-#include <string.h>
 #include <sys/wait.h>
-#include <time.h>
-#include <math.h>
 #include <semaphore.h>
 #include <sys/mman.h>
 
-#define SIZE 1000
-#define SNAME_MUTEX "/sem_mutex"
-#define SNAME_NOTFULL "/sem_not_full"
-#define SNAME_NOTEMPTY "/sem_not_empty"
-#define SHM_PATH "/shm"
+#include "paramethers.h"
 
 int pid_producer;
 int pid_consumer;
 int noelement;
 float dataMB;
-char *fifo_time_start = "/tmp/fifo_time_start";
-char *fifo_time_end = "/tmp/fifo_time_end";
 
 /* FUNCTIONS HEADERS */
-int spawn(const char *program, char **arg_list);
+int spawn( const char *program, char **arg_list );
+void create_fifo( const char *name );
+int interpreter();
+double closing_function();
 
 /* FUNCTIONS */
-int spawn(const char *program, char **arg_list)
+int spawn( const char *program, char **arg_list )
 {
     /* Function to generate a child process, it returns the PID of the child. */
 
@@ -47,7 +39,7 @@ int spawn(const char *program, char **arg_list)
     }
 }
 
-void create_fifo(const char *name)
+void create_fifo( const char *name )
 {
     /* Function to generate a named pipe. */
     mkfifo(name, 0666);
@@ -128,8 +120,8 @@ double closing_function()
     int fd_time_start, fd_time_end;
     double start, end;
 
-    fd_time_start = open(fifo_time_start, O_RDONLY);
-    fd_time_end = open(fifo_time_end, O_RDONLY);
+    fd_time_start = open(TSTART_PATH, O_RDONLY);
+    fd_time_end = open(TEND_PATH, O_RDONLY);
 
     waitpid(pid_producer, &prod_status, 0);
     waitpid(pid_consumer, &cons_status, 0);
@@ -150,8 +142,9 @@ double closing_function()
 int main()
 {
     // system("clear");
-    create_fifo(fifo_time_start);
-    create_fifo(fifo_time_end);
+    FILE * tests = fopen( "./tests_performed.txt", "w");
+    create_fifo(TSTART_PATH);
+    create_fifo(TEND_PATH);
 
     // long int start, end;
     while (1)
@@ -163,7 +156,7 @@ int main()
 
         if (command == 1) // named pipe
         {
-            create_fifo("/tmp/fifo_p_to_c");
+            create_fifo(PIPE_PATH);
 
             printf("Sending data...\n");
             fflush(stdout);
@@ -176,9 +169,10 @@ int main()
 
             double time = closing_function();
 
-            printf("---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf("\n---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            fprintf(tests, "---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
-            unlink("/tmp/fifo_p_to_c");
+            unlink(PIPE_PATH);
         }
         if (command == 2) // unnamed pipe
         {
@@ -201,9 +195,8 @@ int main()
 
             double time = closing_function();
 
-            printf("---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
-
-            unlink("/tmp/fifo_p_to_c");
+            printf("\n---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            fprintf(tests, "---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
         }
         if (command == 3) // sockets
         {
@@ -223,14 +216,15 @@ int main()
 
             double time = closing_function();
 
-            printf("---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf("\n---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            fprintf(tests, "---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
         }
         if (command == 4)
         {
             printf("Sending data...\n");
             fflush(stdout);
 
-            int shm_fd = shm_open(SHM_PATH, O_CREAT | O_RDWR, 0666);
+            int shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
             ftruncate(shm_fd, SIZE);
 
             sem_t *mutex = sem_open(SNAME_MUTEX, O_CREAT, 0644, 1);
@@ -244,9 +238,10 @@ int main()
             pid_consumer = spawn("./consumer_shm", arg_list_consumer);
 
             double time = closing_function();
-            printf("---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf("\n---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            fprintf(tests, "---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
-            shm_unlink(SHM_PATH);
+            shm_unlink(SHM_NAME);
 
             sem_close(mutex);
             sem_close(NotFull);
@@ -261,10 +256,9 @@ int main()
         {
             break;
         }
-        sleep(1);
     }
-    unlink("/tmp/fifo_time_start");
-    unlink("/tmp/fifo_time_end");
+    unlink(TSTART_PATH);
+    unlink(TEND_PATH);
 
     return 0;
 }
