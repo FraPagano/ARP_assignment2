@@ -9,7 +9,7 @@
 #include <semaphore.h>
 #include <sys/mman.h>
 
-#include "paramethers.h"
+#include "parameters.h"
 
 int pid_producer;
 int pid_consumer;

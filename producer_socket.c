@@ -6,7 +6,7 @@
 #include <string.h>
 #include <netdb.h>
 
-#include "paramethers.h"
+#include "parameters.h"
 
 int main(int argc, char *argv[])
 {

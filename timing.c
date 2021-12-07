@@ -6,7 +6,7 @@
 #include <time.h>
 #include <math.h>
 
-#include "paramethers.h"
+#include "parameters.h"
 
 void send_start_time () {
     struct timespec start;
