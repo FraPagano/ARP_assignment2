@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     socklen_t len = sizeof(serv_addr);
 
-    if (getsockname(sockfd, (struct sockadrr *)&serv_addr, &len) == -1)
+    if (getsockname(sockfd, (struct sockaddr *)&serv_addr, &len) == -1)
     {
         perror("getsockname()");
     }
