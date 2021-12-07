@@ -15,16 +15,17 @@ int main(int argc, char *argv[])
 
     // The variable server is a pointer to a structure of type hostent. This structure is defined in the header file netdb.h
 
-    struct hostent * server = gethostbyname(argv[1]);
-    int portno = atoi(argv[2]);
-    int noelement_to_send = atoi(argv[3]);
+    struct hostent *server = gethostbyname(argv[1]);
+    int noelement_to_send = atoi(argv[2]);
+    int portno;
+    int fd_port = open("/tmp/fifo_port", O_RDONLY);
+    read(fd_port, &portno, sizeof(int));
 
     sockfd = CHECK(socket(AF_INET, SOCK_STREAM, 0));
 
     // argv[1] contains the name of a host on the Internet
     // gethostbyname() takes such a name as an argument and returns a pointer to a hostent containing information about that host.
     // The field char *h_addr contains the IP address.
-    
 
     if (server == NULL)
     {
@@ -62,6 +63,8 @@ int main(int argc, char *argv[])
         }
     }
     sleep(1);
+
+    close(fd_port);
     close(sockfd);
     return 0;
 }

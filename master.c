@@ -17,13 +17,13 @@ int noelement;
 float dataMB;
 
 /* FUNCTIONS HEADERS */
-int spawn( const char *program, char **arg_list );
-void create_fifo( const char *name );
+int spawn(const char *program, char **arg_list);
+void create_fifo(const char *name);
 int interpreter();
 double closing_function();
 
 /* FUNCTIONS */
-int spawn( const char *program, char **arg_list )
+int spawn(const char *program, char **arg_list)
 {
     /* Function to generate a child process, it returns the PID of the child. */
 
@@ -39,7 +39,7 @@ int spawn( const char *program, char **arg_list )
     }
 }
 
-void create_fifo( const char *name )
+void create_fifo(const char *name)
 {
     /* Function to generate a named pipe. */
     mkfifo(name, 0666);
@@ -142,7 +142,7 @@ double closing_function()
 int main()
 {
     // system("clear");
-    FILE * tests = fopen( "./tests_performed.txt", "w");
+    FILE *tests = fopen("./tests_performed.txt", "w");
     create_fifo(TSTART_PATH);
     create_fifo(TEND_PATH);
 
@@ -200,24 +200,22 @@ int main()
         }
         if (command == 3) // sockets
         {
-
+            create_fifo("/tmp/fifo_port");
             int portno;
-            printf("Insert the port number:\n");
-            scanf("%d", &portno);
-            char portno_char[30];
-            sprintf(portno_char, "%d", portno);
+            printf("OS is searching for a free port\n");
             printf("Sending data...\n");
             fflush(stdout);
 
-            char *arg_list_consumer[] = {"./consumer_socket", portno_char, noelement_char, (char *)NULL};
+            char *arg_list_consumer[] = {"./consumer_socket", noelement_char, (char *)NULL};
             pid_consumer = spawn("./consumer_socket", arg_list_consumer);
-            char *arg_list_producer[] = {"./producer_socket", "localhost", portno_char, noelement_char, (char *)NULL};
+            char *arg_list_producer[] = {"./producer_socket", "localhost", noelement_char, (char *)NULL};
             pid_producer = spawn("./producer_socket", arg_list_producer);
 
             double time = closing_function();
 
             printf("\n---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
             fprintf(tests, "---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            unlink("/tmp/fifo_port");
         }
         if (command == 4)
         {

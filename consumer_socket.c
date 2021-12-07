@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <netdb.h>
+#include "sys/socket.h"
 
 #include "parameters.h"
 
@@ -14,8 +15,8 @@ int main(int argc, char *argv[])
     // n is the return value for the read() and write() calls; i.e. it contains the number of characters read or written.
     int sockfd, newsockfd, clilen, B[MAX], data;
 
-    int portno = atoi(argv[1]);
-    int noelement_to_read = atoi(argv[2]);
+    int portno;
+    int noelement_to_read = atoi(argv[1]);
 
     // A sockaddr_in is a structure containing an internet address. This structure is defined in <netinet/in.h>
     // The variable serv_addr will contain the address of the server, and cli_addr will contain the
@@ -48,7 +49,6 @@ int main(int argc, char *argv[])
 
     // The port number on which the server will listen for connections is passed in as an argument, and this
     // statement uses the atoi() function to convert this from a string of digits to an integer
-    
 
     // he variable serv_addr is a structure of type struct sockaddr_in. This structure has four fields. The first
     // field is short sin_family, which contains a code for the address family. It should always be set to the
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     // instead of simply copying the port number to this field, it is necessary to convert this to network byte order
     // using the function htons() which converts a port number in host byte order to a port number in network byte
     // order.
-    serv_addr.sin_port = htons(portno);
+    serv_addr.sin_port = 0; // htons(portno);
 
     //   The third field of sockaddr_in is a structure of type struct in_addr which contains only a single field
     // unsigned long s_addr. This field contains the IP address of the host. For server code, this will always be
@@ -81,13 +81,28 @@ int main(int argc, char *argv[])
     // doesn't check for errors.
     listen(sockfd, 5);
 
+    socklen_t len = sizeof(serv_addr);
+
+    if (getsockname(sockfd, (struct sockadrr *)&serv_addr, &len) == -1)
+    {
+        perror("getsockname()");
+    }
+    else
+    {
+        printf("Used port number: %d\n", ntohs(serv_addr.sin_port));
+    }
+
+    portno = htons(serv_addr.sin_port);
+    int fd_port = open("/tmp/fifo_port", O_WRONLY);
+    write(fd_port, &portno, sizeof(int));
+
     // The accept() system call causes the process to block until a client connects to the server. Thus, it wakes up
     // the process when a connection from a client has been successfully established. It returns a new file
     // descriptor, and all communication on this connection should be done using the new file descriptor. The
     // second argument is a reference pointer to the address of the client on the other end of the connection, and the
     // third argument is the size of this structure.
     clilen = sizeof(cli_addr);
-    newsockfd = CHECK (accept(sockfd, (struct sockaddr *)&cli_addr, &clilen));
+    newsockfd = CHECK(accept(sockfd, (struct sockaddr *)&cli_addr, &clilen));
 
     // Note that we would only get to this point after a client has successfully connected to our server. This code
     // initializes the buffer using the bzero() function, and then reads from the socket. Note that the read call uses
@@ -114,6 +129,8 @@ int main(int argc, char *argv[])
     // everything written by the client will be read by the server, and everything written by the server will be read
     // by the client. This code simply writes a short message to the client.
     sleep(1);
+
+    close(fd_port);
     close(sockfd);
     return 0;
 }
