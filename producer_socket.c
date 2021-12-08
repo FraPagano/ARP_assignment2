@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     struct hostent *server = gethostbyname(argv[1]);
     int noelement_to_send = atoi(argv[2]);
     int portno;
-    int fd_port = open("/tmp/fifo_port", O_RDONLY);
+    int fd_port = open(PORT_PATH, O_RDONLY);
     read(fd_port, &portno, sizeof(int));
 
     sockfd = CHECK(socket(AF_INET, SOCK_STREAM, 0));

@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("Used port number: %d\n", ntohs(serv_addr.sin_port));
+        printf(BHBLU "Used port number: %d" RESET "\n", ntohs(serv_addr.sin_port));
     }
 
     portno = htons(serv_addr.sin_port);
-    int fd_port = open("/tmp/fifo_port", O_WRONLY);
+    int fd_port = open(PORT_PATH, O_WRONLY);
     write(fd_port, &portno, sizeof(int));
 
     // The accept() system call causes the process to block until a client connects to the server. Thus, it wakes up

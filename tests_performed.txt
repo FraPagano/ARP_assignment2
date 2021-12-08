@@ -1,4 +1,2 @@
----> SOCKET took 530.717773 milliseconds to transfer 3.000000 MB.
- 
----> SOCKET took 1764.110107 milliseconds to transfer 10.000000 MB.
+---> SOCKET took 212.264404 milliseconds to transfer 1.000000 MB.
  

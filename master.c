@@ -53,35 +53,35 @@ int interpreter()
     while (1)
     {
 
-        printf("Please, choose the data transmission modality: \n");
-        printf(" [1] Named pipe \n [2] Unnamed pipe \n [3] Sockets \n [4] Shared memory \n [5] For exiting\n");
+        printf(BHWHT "Please, choose the data transmission modality: " RESET "\n");
+        printf(BHBLU " [1] Named pipe " RESET "\n" BHYEL " [2] Unnamed pipe " RESET "\n" BHCYN " [3] Sockets " RESET "\n" BHMAG " [4] Shared memory " RESET "\n" BHRED " [5] For exiting" RESET "\n");
         fflush(stdout);
         scanf(" %d", &c);
 
         if (c == 1)
         {
-            printf("NAMED PIPE selected, ");
+            printf(BHGRN "NAMED PIPE selected, " RESET);
             fflush(stdout);
             break;
         }
         else if (c == 2)
         {
-            printf("UNNAMED PIPE selected, ");
+            printf(BHGRN "UNNAMED PIPE selected, " RESET);
             break;
         }
         else if (c == 3)
         {
-            printf("SOCKETS selected, ");
+            printf(BHGRN "SOCKETS selected, " RESET);
             break;
         }
         else if (c == 4)
         {
-            printf("SHARED MEMORY selected, ");
+            printf(BHGRN "SHARED MEMORY selected, " RESET);
             break;
         }
         else if (c == 5)
         {
-            printf("Exiting...\n");
+            printf(BHRED "Exiting..." RESET "\n");
             return c;
         }
         else
@@ -94,14 +94,14 @@ int interpreter()
 
     while (1)
     {
-        printf("Insert how many MB do you want to send: [float < 100] \n");
+        printf(BHGRN "Insert how many MB do you want to send: [float < 100] " RESET "\n");
         fflush(stdout);
 
         scanf("%f", &dataMB);
 
         if (dataMB > 100)
         {
-            printf("The number must be less then or equal 100.\n Please, ");
+            printf(BHRED "The number must be less then or equal 100.\n" RESET);
         }
         else
         {
@@ -132,8 +132,8 @@ double closing_function()
     close(fd_time_start);
     close(fd_time_end);
 
-    printf("Producer (PID = %d) exited with status %d\n", pid_producer, prod_status);
-    printf("Consumer (PID = %d) exited with status %d\n", pid_consumer, cons_status);
+    printf(BHCYN "Producer (PID = %d) exited with status %d" RESET "\n", pid_producer, prod_status);
+    printf(BHCYN "Consumer (PID = %d) exited with status %d" RESET "\n", pid_consumer, cons_status);
 
     return (end - start);
 }
@@ -158,7 +158,7 @@ int main()
         {
             create_fifo(PIPE_PATH);
 
-            printf("Sending data...\n");
+            printf(BHBLU "Sending data..." RESET "\n");
             fflush(stdout);
 
             char *arg_list_producer_named[] = {"./producer_named", noelement_char, (char *)NULL};
@@ -169,7 +169,7 @@ int main()
 
             double time = closing_function();
 
-            printf("\n---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf("\n" BHWHT "---> NAMED PIPE took " BHYEL "%f" BHWHT " milliseconds to transfer " BHYEL "%f MB." RESET "\n \n", time, dataMB);
             fprintf(tests, "---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
             unlink(PIPE_PATH);
@@ -182,7 +182,7 @@ int main()
             char input_fd_char[20];
             sprintf(input_fd_char, "%d", fd_unnamed[1]);
 
-            printf("Sending data...\n");
+            printf(BHBLU "Sending data..." RESET "\n");
             fflush(stdout);
 
             char *arg_list_producer[] = {"./producer_unnamed", noelement_char, input_fd_char, (char *)NULL};
@@ -195,15 +195,15 @@ int main()
 
             double time = closing_function();
 
-            printf("\n---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf(BHWHT "\n---> UNNAMED PIPE took" BHYEL " %f " BHWHT " milliseconds to transfer" BHYEL " %f MB." RESET "\n \n", time, dataMB);
             fprintf(tests, "---> UNNAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
         }
         if (command == 3) // sockets
         {
-            create_fifo("/tmp/fifo_port");
+            create_fifo(PORT_PATH);
             int portno;
-            printf("OS is searching for a free port\n");
-            printf("Sending data...\n");
+            printf(BHBLU "OS is searching for a free port" RESET "\n");
+            printf(BHBLU "Sending data..." RESET "\n");
             fflush(stdout);
 
             char *arg_list_consumer[] = {"./consumer_socket", noelement_char, (char *)NULL};
@@ -213,13 +213,13 @@ int main()
 
             double time = closing_function();
 
-            printf("\n---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf(BHWHT "\n---> SOCKET took " BHYEL "%f" BHWHT " milliseconds to transfer" BHYEL " %f MB." RESET "\n \n", time, dataMB);
             fprintf(tests, "---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
-            unlink("/tmp/fifo_port");
+            unlink(PORT_PATH);
         }
         if (command == 4)
         {
-            printf("Sending data...\n");
+            printf(BHBLU "Sending data..." RESET "\n");
             fflush(stdout);
 
             int shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
@@ -236,7 +236,7 @@ int main()
             pid_consumer = spawn("./consumer_shm", arg_list_consumer);
 
             double time = closing_function();
-            printf("\n---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
+            printf(BHWHT "\n---> SHARED MEMORY took " BHYEL "%f" BHWHT " milliseconds to transfer" BHYEL " %f MB" RESET ".\n \n", time, dataMB);
             fprintf(tests, "---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
             shm_unlink(SHM_NAME);
