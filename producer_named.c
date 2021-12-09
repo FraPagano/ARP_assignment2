@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-
+#include <string.h>
 #include "parameters.h"
 
 int main(int argc, char *argv[])
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     int noelement_to_send = atoi(argv[1]);
 
-    fd = open(PIPE_PATH, O_WRONLY);
+    fd = CHECK(open(PIPE_PATH, O_WRONLY));
 
     for (int i = 0; i < MAX; i++)
     {
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noelement_to_send; i++)
     {
-        write(fd, &data[i], sizeof(int));
+        CHECK(write(fd, &data[i], sizeof(int)));
 
         if (i == MAX)
         {
@@ -33,6 +33,5 @@ int main(int argc, char *argv[])
         }
     }
     sleep(1);
-    close(fd);
-    return 0;
+    CHECK(close(fd));
 }

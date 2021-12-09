@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <semaphore.h>
 #include <sys/mman.h>
@@ -33,7 +34,7 @@ int spawn(const char *program, char **arg_list)
 
     else
     { // Child process.
-        execvp(program, arg_list);
+        CHECK(execvp(program, arg_list));
         perror("exec failed"); // If it's executed, an error occurred.
         return -4;
     }
@@ -123,14 +124,14 @@ double closing_function()
     fd_time_start = open(TSTART_PATH, O_RDONLY);
     fd_time_end = open(TEND_PATH, O_RDONLY);
 
-    waitpid(pid_producer, &prod_status, 0);
-    waitpid(pid_consumer, &cons_status, 0);
+    CHECK(waitpid(pid_producer, &prod_status, 0));
+    CHECK(waitpid(pid_consumer, &cons_status, 0));
 
-    read(fd_time_start, &start, sizeof(start));
-    read(fd_time_end, &end, sizeof(end));
+    CHECK(read(fd_time_start, &start, sizeof(start)));
+    CHECK(read(fd_time_end, &end, sizeof(end)));
 
-    close(fd_time_start);
-    close(fd_time_end);
+    CHECK(close(fd_time_start));
+    CHECK(close(fd_time_end));
 
     printf(BHCYN "Producer (PID = %d) exited with status %d" RESET "\n", pid_producer, prod_status);
     printf(BHCYN "Consumer (PID = %d) exited with status %d" RESET "\n", pid_consumer, cons_status);
@@ -172,12 +173,12 @@ int main()
             printf("\n" BHWHT "---> NAMED PIPE took " BHYEL "%f" BHWHT " milliseconds to transfer " BHYEL "%f MB." RESET "\n \n", time, dataMB);
             fprintf(tests, "---> NAMED PIPE took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
-            unlink(PIPE_PATH);
+            CHECK(unlink(PIPE_PATH));
         }
         if (command == 2) // unnamed pipe
         {
             int fd_unnamed[2];
-            pipe(fd_unnamed);
+            CHECK(pipe(fd_unnamed));
 
             char input_fd_char[20];
             sprintf(input_fd_char, "%d", fd_unnamed[1]);
@@ -215,7 +216,7 @@ int main()
 
             printf(BHWHT "\n---> SOCKET took " BHYEL "%f" BHWHT " milliseconds to transfer" BHYEL " %f MB." RESET "\n \n", time, dataMB);
             fprintf(tests, "---> SOCKET took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
-            unlink(PORT_PATH);
+            CHECK(unlink(PORT_PATH));
         }
         if (command == 4)
         {
@@ -239,15 +240,15 @@ int main()
             printf(BHWHT "\n---> SHARED MEMORY took " BHYEL "%f" BHWHT " milliseconds to transfer" BHYEL " %f MB" RESET ".\n \n", time, dataMB);
             fprintf(tests, "---> SHARED MEMORY took %f milliseconds to transfer %f MB.\n \n", time, dataMB);
 
-            shm_unlink(SHM_NAME);
+            CHECK(shm_unlink(SHM_NAME));
 
-            sem_close(mutex);
-            sem_close(NotFull);
-            sem_close(NotEmpty);
+            CHECK(sem_close(mutex));
+            CHECK(sem_close(NotFull));
+            CHECK(sem_close(NotEmpty));
 
-            sem_unlink(SNAME_MUTEX);
-            sem_unlink(SNAME_NOTFULL);
-            sem_unlink(SNAME_NOTEMPTY);
+            CHECK(sem_unlink(SNAME_MUTEX));
+            CHECK(sem_unlink(SNAME_NOTFULL));
+            CHECK(sem_unlink(SNAME_NOTEMPTY));
         }
 
         if (command == 5)
@@ -255,8 +256,8 @@ int main()
             break;
         }
     }
-    unlink(TSTART_PATH);
-    unlink(TEND_PATH);
+    CHECK(unlink(TSTART_PATH));
+    CHECK(unlink(TEND_PATH));
 
     return 0;
 }

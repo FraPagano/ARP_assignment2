@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-
+#include <string.h>
 #include "parameters.h"
 
 int main(int argc, char *argv[])
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noelement_to_read; i++)
     {
-        read(fd, &data, sizeof(int));
+        CHECK(read(fd, &data, sizeof(int)));
 
         B[i] = data;
 
@@ -30,6 +30,6 @@ int main(int argc, char *argv[])
     send_end_time();
 
     sleep(1);
-    close(fd);
+    CHECK(close(fd));
     return 0;
 }

@@ -20,11 +20,27 @@ int main(int argc, char *argv[])
     sem_t *NotFull = sem_open(SNAME_NOTFULL, 0);
     sem_t *NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
 
+    if (mutex == SEM_FAILED)
+    {
+        perror("Failed to open mutex semaphore\n");
+        exit(-1);
+    }
+    if (NotFull == SEM_FAILED)
+    {
+        perror("Failed to open NotFull semaphore\n");
+        exit(-1);
+    }
+    if (NotEmpty == SEM_FAILED)
+    {
+        perror("Failed to open NotEmpty semaphore\n");
+        exit(-1);
+    }
+
     /*the mmap() funciton establishes a memory-mapped file containing the shared memory object. It also
     returns a pointer to the memory-mapped file that is used for accessing the shared memory object.
     */
 
-    int shm_fd = shm_open(SHM_NAME, O_RDWR, 0666);
+    int shm_fd = CHECK(shm_open(SHM_NAME, O_RDWR, 0666));
     void *shm_ptr = mmap(NULL, CBUFFER_SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
     for (int i = 0; i < MAX; i++)
@@ -36,14 +52,14 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noelement_to_send; i++)
     {
-        sem_wait(NotFull);
-        sem_wait(mutex);
+        CHECK(sem_wait(NotFull));
+        CHECK(sem_wait(mutex));
 
         memcpy(&(((int *)shm_ptr)[head]), &(data[i]), sizeof(int));
         head = (head + 1) % BUFFER_NOELEMENT;
 
-        sem_post(mutex);
-        sem_post(NotEmpty);
+        CHECK(sem_post(mutex));
+        CHECK(sem_post(NotEmpty));
 
         if (i == MAX)
         {
@@ -52,6 +68,6 @@ int main(int argc, char *argv[])
         }
     }
     sleep(1);
-    close(shm_fd);
+    CHECK(close(shm_fd));
     return 0;
 }

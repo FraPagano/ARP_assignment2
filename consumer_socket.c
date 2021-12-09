@@ -79,22 +79,16 @@ int main(int argc, char *argv[])
     // can be waiting while the process is handling a particular connection. This should be set to 5, the maximum
     // size permitted by most systems. If the first argument is a valid socket, this call cannot fail, and so the code
     // doesn't check for errors.
-    listen(sockfd, 5);
+    CHECK(listen(sockfd, 5));
 
     socklen_t len = sizeof(serv_addr);
 
-    if (getsockname(sockfd, (struct sockaddr *)&serv_addr, &len) == -1)
-    {
-        perror("getsockname()");
-    }
-    else
-    {
-        printf(BHBLU "Used port number: %d" RESET "\n", ntohs(serv_addr.sin_port));
-    }
+    CHECK(getsockname(sockfd, (struct sockaddr *)&serv_addr, &len));
+    printf(BHBLU "Used port number: %d" RESET "\n", ntohs(serv_addr.sin_port));
 
     portno = htons(serv_addr.sin_port);
-    int fd_port = open(PORT_PATH, O_WRONLY);
-    write(fd_port, &portno, sizeof(int));
+    int fd_port = CHECK(open(PORT_PATH, O_WRONLY));
+    CHECK(write(fd_port, &portno, sizeof(int)));
 
     // The accept() system call causes the process to block until a client connects to the server. Thus, it wakes up
     // the process when a connection from a client has been successfully established. It returns a new file
@@ -113,7 +107,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noelement_to_read; i++)
     {
-        read(newsockfd, &data, sizeof(int));
+        CHECK(read(newsockfd, &data, sizeof(int)));
 
         B[i] = data;
 
@@ -130,7 +124,7 @@ int main(int argc, char *argv[])
     // by the client. This code simply writes a short message to the client.
     sleep(1);
 
-    close(fd_port);
-    close(sockfd);
+    CHECK(close(fd_port));
+    CHECK(close(sockfd));
     return 0;
 }

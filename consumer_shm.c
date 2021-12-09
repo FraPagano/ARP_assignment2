@@ -16,24 +16,40 @@ int main(int argc, char *argv[])
 
     int noelement_to_read = atoi(argv[1]);
 
-    int shm_fd = shm_open(SHM_NAME, O_RDONLY, 0666);
+    int shm_fd = CHECK(shm_open(SHM_NAME, O_RDONLY, 0666));
     void *shm_ptr = mmap(NULL, CBUFFER_SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
 
     sem_t *mutex = sem_open(SNAME_MUTEX, 0);
     sem_t *NotFull = sem_open(SNAME_NOTFULL, 0);
     sem_t *NotEmpty = sem_open(SNAME_NOTEMPTY, 0);
 
+    if (mutex == SEM_FAILED)
+    {
+        perror("Failed to open mutex semaphore\n");
+        exit(-1);
+    }
+    if (NotFull == SEM_FAILED)
+    {
+        perror("Failed to open NotFull semaphore\n");
+        exit(-1);
+    }
+    if (NotEmpty == SEM_FAILED)
+    {
+        perror("Failed to open NotEmpty semaphore\n");
+        exit(-1);
+    }
+
     for (int i = 0; i < noelement_to_read; i++)
     {
-        sem_wait(NotEmpty);
-        sem_wait(mutex);
+        CHECK(sem_wait(NotEmpty));
+        CHECK(sem_wait(mutex));
 
         memcpy(&data, &(((int *)shm_ptr)[tail]), sizeof(int));
         B[i] = data;
         tail = (tail + 1) % BUFFER_NOELEMENT;
 
-        sem_post(mutex);
-        sem_post(NotFull);
+        CHECK(sem_post(mutex));
+        CHECK(sem_post(NotFull));
 
         if (i == MAX)
         {
@@ -44,6 +60,6 @@ int main(int argc, char *argv[])
 
     send_end_time();
     sleep(1);
-    close(shm_fd);
+    CHECK(close(shm_fd));
     return 0;
 }

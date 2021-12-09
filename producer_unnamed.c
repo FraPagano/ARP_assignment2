@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "parameters.h"
 
@@ -23,8 +24,8 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noelement_to_send; i++)
     {
-        write(fd, &data[i], sizeof(int));
-        
+        CHECK(write(fd, &data[i], sizeof(int)));
+
         if (i == MAX)
         {
             noelement_to_send = noelement_to_send - MAX;
@@ -32,6 +33,6 @@ int main(int argc, char *argv[])
         }
     }
     sleep(1);
-    close(fd);
+    CHECK(close(fd));
     return 0;
 }

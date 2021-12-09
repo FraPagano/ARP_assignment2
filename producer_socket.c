@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
     struct hostent *server = gethostbyname(argv[1]);
     int noelement_to_send = atoi(argv[2]);
     int portno;
-    int fd_port = open(PORT_PATH, O_RDONLY);
-    read(fd_port, &portno, sizeof(int));
+    int fd_port = CHECK(open(PORT_PATH, O_RDONLY));
+    CHECK(read(fd_port, &portno, sizeof(int)));
 
     sockfd = CHECK(socket(AF_INET, SOCK_STREAM, 0));
 
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noelement_to_send; i++)
     {
-        write(sockfd, &data[i], sizeof(int));
+        CHECK(write(sockfd, &data[i], sizeof(int)));
 
         if (i == MAX)
         {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
     sleep(1);
 
-    close(fd_port);
-    close(sockfd);
+    CHECK(close(fd_port));
+    CHECK(close(sockfd));
     return 0;
 }
