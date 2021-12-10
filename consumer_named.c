@@ -19,6 +19,11 @@ int main(int argc, char *argv[])
     {
         CHECK(read(fd, &data, sizeof(int)));
 
+        if (i % (noelement_to_read / 100) == 0)
+        {
+            loading_bar(i, noelement_to_read);
+        }
+
         B[i] = data;
 
         if (i == MAX)

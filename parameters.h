@@ -28,3 +28,4 @@
 
 void send_start_time();
 void send_end_time();
+void loading_bar(int percent, int buf_size);

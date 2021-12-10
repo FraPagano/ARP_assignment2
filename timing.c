@@ -38,3 +38,20 @@ void send_end_time()
 
     CHECK(close(fd_time_end));
 }
+
+void loading_bar(int percent, int buf_size)
+{
+    const int PROG = 30;
+    int num_chars = (percent / (buf_size / 100)) * PROG / 100;
+    printf("\r[");
+    for (int i = 0; i <= num_chars; i++)
+    {
+        printf("#");
+    }
+    for (int i = 0; i < PROG - num_chars - 1; i++)
+    {
+        printf(" ");
+    }
+    printf("] %d %% DONE", percent / ((buf_size / 100) + 1));
+    fflush(stdout);
+}
