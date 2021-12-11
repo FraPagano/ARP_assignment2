@@ -23,9 +23,11 @@ void logPrint(char *string)
 int main(int argc, char *argv[])
 {
     int data, B[MAX];
+    int j = 0;
     int tail = 0;
     log_file = fopen("./log.txt", "a");
-    int noelement_to_read = atoi(argv[1]);
+    int total_elements = atoi(argv[1]);
+    int noelement_to_read = total_elements;
 
     int shm_fd = CHECK(shm_open(SHM_NAME, O_RDONLY, 0666));
     void *shm_ptr = mmap(NULL, CBUFFER_SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
@@ -57,9 +59,9 @@ int main(int argc, char *argv[])
 
         memcpy(&data, &(((int *)shm_ptr)[tail]), sizeof(int));
 
-        if (i % (noelement_to_read / 100) == 0)
+        if (j % (total_elements / 100) == 0)
         {
-            loading_bar(i, noelement_to_read);
+            loading_bar(j, total_elements);
         }
 
         B[i] = data;
@@ -73,6 +75,7 @@ int main(int argc, char *argv[])
             noelement_to_read = noelement_to_read - MAX;
             i = 0;
         }
+        j++;
     }
     logPrint("Consumer Shared Memory    :Data read\n");
     send_end_time();
