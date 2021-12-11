@@ -56,6 +56,12 @@ int main(int argc, char *argv[])
         CHECK(sem_wait(mutex));
 
         memcpy(&data, &(((int *)shm_ptr)[tail]), sizeof(int));
+
+        if (i % (noelement_to_read / 100) == 0)
+        {
+            loading_bar(i, noelement_to_read);
+        }
+
         B[i] = data;
         tail = (tail + 1) % BUFFER_NOELEMENT;
 

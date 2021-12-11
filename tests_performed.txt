@@ -1,8 +1,8 @@
----> NAMED PIPE took 1144.329102 milliseconds to transfer 2.000000 MB.
+---> NAMED PIPE took 5461.827148 milliseconds to transfer 10.000000 MB.
  
----> UNNAMED PIPE took 313.000000 milliseconds to transfer 1.000000 MB.
+---> UNNAMED PIPE took 3405.346436 milliseconds to transfer 10.000000 MB.
  
----> SOCKET took 349.525879 milliseconds to transfer 1.000000 MB.
+---> SOCKET took 1704.227539 milliseconds to transfer 4.000000 MB.
  
----> SHARED MEMORY took 289.733887 milliseconds to transfer 1.000000 MB.
+---> SHARED MEMORY took 3550.450439 milliseconds to transfer 5.000000 MB.
  

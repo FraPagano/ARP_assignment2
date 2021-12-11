@@ -1,41 +1,40 @@
-Sat Dec 11 16:58:01: Master    : Log file created by master process.
-Sat Dec 11 16:58:02: Master    : '1' keyboard key pressed
-Sat Dec 11 16:58:03: Master    : 2.000000 MB inserted
-Sat Dec 11 16:58:03: Master    : Named pipe selected
-Sat Dec 11 16:58:03: Master    : Creating producer and consumer child processes
-Sat Dec 11 16:58:04: Producer Named    :Data read
-Sat Dec 11 16:58:04: Producer Named    :Data written
-Sat Dec 11 16:58:05: Master    : Producer (PID = 7198) exited with status 0
-Sat Dec 11 16:58:05: Master    : Consumer (PID = 7199) exited with status 0
-Sat Dec 11 16:58:05: Master    : NAMED PIPE took 1144.329102 milliseconds to transfer 2.000000 MB
-Sat Dec 11 16:58:06: Master    : '2' keyboard key pressed
-Sat Dec 11 16:58:07: Master    : 1.000000 MB inserted
-Sat Dec 11 16:58:07: Master    : Creating producer and consumer child processes
-Sat Dec 11 16:58:07: Producer Unamed    :Data written
-Sat Dec 11 16:58:08: Producer Unnamed    :Data read
-Sat Dec 11 16:58:09: Master    : Producer (PID = 7200) exited with status 0
-Sat Dec 11 16:58:09: Master    : Consumer (PID = 7201) exited with status 0
-Sat Dec 11 16:58:09: Master    : Unnamed pipe took 313.000000 milliseconds to transfer 1.000000 MB
-Sat Dec 11 16:58:10: Master    : '3' keyboard key pressed
-Sat Dec 11 16:58:10: Master    : 1.000000 MB inserted
-Sat Dec 11 16:58:10: Master    : Creating producer and consumer child processes
-Sat Dec 11 16:58:10: Consumer Socket    :Used port number: 36503 
-Sat Dec 11 16:58:11: Producer Socket    : Data written
-Sat Dec 11 16:58:11: Producer Socket    : Data read
-Sat Dec 11 16:58:12: Master    : Producer (PID = 7203) exited with status 0
-Sat Dec 11 16:58:12: Master    : Consumer (PID = 7202) exited with status 0
-Sat Dec 11 16:58:12: Master    : SOCKET took 349.525879 milliseconds to transfer 1.000000 MB
-Sat Dec 11 16:58:13: Master    : '4' keyboard key pressed
-Sat Dec 11 16:58:13: Master    : 1.000000 MB inserted
-Sat Dec 11 16:58:13: Master    : Creating producer and consumer child processes
-Sat Dec 11 16:58:13: Producer Shared Memory    :Data written
-Sat Dec 11 16:58:13: Consumer Shared Memory    :Data read
-Sat Dec 11 16:58:14: Master    : Producer (PID = 7204) exited with status 0
-Sat Dec 11 16:58:14: Master    : Consumer (PID = 7205) exited with status 0
-Sat Dec 11 16:58:14: Master    : SHARED MEMORY took 289.733887 milliseconds to transfer 1.000000 MB
-Sat Dec 11 16:58:14: Master    : Shared memory space unlinked
-Sat Dec 11 16:58:14: Master    : Semaphores unlinked
-Sat Dec 11 16:58:16: Master    : wrong command pressed
-Sat Dec 11 16:58:17: Master    : '5' keyboard key pressed
-Sat Dec 11 16:58:17: Master    : Exiting
-Sat Dec 11 16:58:17: Master    : Master is termitating 
+Sat Dec 11 17:12:09: Master    : Log file created by master process.
+Sat Dec 11 17:12:10: Master    : '1' keyboard key pressed
+Sat Dec 11 17:12:12: Master    : 10.000000 MB inserted
+Sat Dec 11 17:12:12: Master    : Named pipe selected
+Sat Dec 11 17:12:12: Master    : Creating producer and consumer child processes
+Sat Dec 11 17:12:17: Producer Named    :Data written
+Sat Dec 11 17:12:17: Consumer Named    :Data read
+Sat Dec 11 17:12:18: Master    : Producer (PID = 8232) exited with status 0
+Sat Dec 11 17:12:18: Master    : Consumer (PID = 8233) exited with status 0
+Sat Dec 11 17:12:18: Master    : NAMED PIPE took 5461.827148 milliseconds to transfer 10.000000 MB
+Sat Dec 11 17:12:19: Master    : '2' keyboard key pressed
+Sat Dec 11 17:12:20: Master    : 10.000000 MB inserted
+Sat Dec 11 17:12:20: Master    : Creating producer and consumer child processes
+Sat Dec 11 17:12:23: Producer Unamed    :Data written
+Sat Dec 11 17:12:24: Producer Unnamed    :Data read
+Sat Dec 11 17:12:25: Master    : Producer (PID = 8234) exited with status 0
+Sat Dec 11 17:12:25: Master    : Consumer (PID = 8235) exited with status 0
+Sat Dec 11 17:12:25: Master    : Unnamed pipe took 3405.346436 milliseconds to transfer 10.000000 MB
+Sat Dec 11 17:12:26: Master    : '3' keyboard key pressed
+Sat Dec 11 17:12:27: Master    : 4.000000 MB inserted
+Sat Dec 11 17:12:27: Master    : Creating producer and consumer child processes
+Sat Dec 11 17:12:27: Consumer Socket    :Used port number: 40143 
+Sat Dec 11 17:12:29: Producer Socket    : Data written
+Sat Dec 11 17:12:29: Producer Socket    : Data read
+Sat Dec 11 17:12:30: Master    : Producer (PID = 8239) exited with status 0
+Sat Dec 11 17:12:30: Master    : Consumer (PID = 8238) exited with status 0
+Sat Dec 11 17:12:30: Master    : SOCKET took 1704.227539 milliseconds to transfer 4.000000 MB
+Sat Dec 11 17:12:32: Master    : '4' keyboard key pressed
+Sat Dec 11 17:12:33: Master    : 5.000000 MB inserted
+Sat Dec 11 17:12:33: Master    : Creating producer and consumer child processes
+Sat Dec 11 17:12:36: Producer Shared Memory    :Data written
+Sat Dec 11 17:12:36: Consumer Shared Memory    :Data read
+Sat Dec 11 17:12:37: Master    : Producer (PID = 8240) exited with status 0
+Sat Dec 11 17:12:37: Master    : Consumer (PID = 8241) exited with status 0
+Sat Dec 11 17:12:37: Master    : SHARED MEMORY took 3550.450439 milliseconds to transfer 5.000000 MB
+Sat Dec 11 17:12:37: Master    : Shared memory space unlinked
+Sat Dec 11 17:12:37: Master    : Semaphores unlinked
+Sat Dec 11 17:12:47: Master    : '5' keyboard key pressed
+Sat Dec 11 17:12:47: Master    : Exiting
+Sat Dec 11 17:12:47: Master    : Master is termitating 

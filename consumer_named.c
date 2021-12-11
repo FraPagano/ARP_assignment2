@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
 {
     int data, fd, B[MAX];
     log_file = fopen("./log.txt", "a");
+
     int noelement_to_read = atoi(argv[1]);
 
     fd = CHECK(open(PIPE_PATH, O_RDONLY));
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
     }
 
     send_end_time();
-    logPrint("Producer Named    :Data read\n");
+    logPrint("Consumer Named    :Data read\n");
     sleep(1);
     CHECK(close(fd));
     return 0;

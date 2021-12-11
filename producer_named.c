@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
             i = 0;
         }
     }
+
     logPrint("Producer Named    :Data written\n");
     sleep(1);
     CHECK(close(fd));
