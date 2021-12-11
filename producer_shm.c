@@ -6,14 +6,25 @@
 #include <string.h>
 #include <semaphore.h>
 #include <sys/mman.h>
-
+#include <time.h>
 #include "parameters.h"
+
+FILE *log_file;
+void logPrint(char *string);
+void logPrint(char *string)
+{
+    /* Function to print on log file adding time stamps. */
+
+    time_t ltime = time(NULL);
+    fprintf(log_file, "%.19s: %s", ctime(&ltime), string);
+    fflush(log_file);
+}
 
 int main(int argc, char *argv[])
 {
     int data[MAX];
     int head = 0;
-
+    log_file = fopen("./log.txt", "a");
     int noelement_to_send = atoi(argv[1]);
 
     sem_t *mutex = sem_open(SNAME_MUTEX, 0);
@@ -67,6 +78,7 @@ int main(int argc, char *argv[])
             i = 0;
         }
     }
+    logPrint("Producer Shared Memory    :Data written\n");
     sleep(1);
     CHECK(close(shm_fd));
     return 0;

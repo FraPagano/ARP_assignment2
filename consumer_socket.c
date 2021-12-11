@@ -6,15 +6,28 @@
 #include <string.h>
 #include <netdb.h>
 #include "sys/socket.h"
-
+#include <time.h>
 #include "parameters.h"
+
+FILE *log_file;
+char str[80];
+void logPrint(char *string);
+
+void logPrint(char *string)
+{
+    /* Function to print on log file adding time stamps. */
+
+    time_t ltime = time(NULL);
+    fprintf(log_file, "%.19s: %s", ctime(&ltime), string);
+    fflush(log_file);
+}
 
 int main(int argc, char *argv[])
 {
     // sockfd and newsockfd are file descriptors. portno stores the port number on which the server accepts connections
     // n is the return value for the read() and write() calls; i.e. it contains the number of characters read or written.
     int sockfd, newsockfd, clilen, B[MAX], data;
-
+    log_file = fopen("./log.txt", "a");
     int portno;
     int noelement_to_read = atoi(argv[1]);
 
@@ -85,7 +98,8 @@ int main(int argc, char *argv[])
 
     CHECK(getsockname(sockfd, (struct sockaddr *)&serv_addr, &len));
     printf(BHBLU "Used port number: %d" RESET "\n", ntohs(serv_addr.sin_port));
-
+    sprintf(str, "Consumer Socket    :Used port number: %d \n", ntohs(serv_addr.sin_port));
+    logPrint(str);
     portno = htons(serv_addr.sin_port);
     int fd_port = CHECK(open(PORT_PATH, O_WRONLY));
     CHECK(write(fd_port, &portno, sizeof(int)));
@@ -122,6 +136,7 @@ int main(int argc, char *argv[])
     // Once a connection has been established, both ends can both read and write to the connection. Naturally,
     // everything written by the client will be read by the server, and everything written by the server will be read
     // by the client. This code simply writes a short message to the client.
+    logPrint("Producer Socket    : Data read\n");
     sleep(1);
 
     CHECK(close(fd_port));

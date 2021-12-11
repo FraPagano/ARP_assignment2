@@ -5,14 +5,27 @@
 #include <unistd.h>
 #include <string.h>
 #include <netdb.h>
-
+#include <time.h>
 #include "parameters.h"
+
+FILE *log_file;
+
+void logPrint(char *string);
+
+void logPrint(char *string)
+{
+    /* Function to print on log file adding time stamps. */
+
+    time_t ltime = time(NULL);
+    fprintf(log_file, "%.19s: %s", ctime(&ltime), string);
+    fflush(log_file);
+}
 
 int main(int argc, char *argv[])
 {
     int sockfd, data[MAX];
     struct sockaddr_in serv_addr;
-
+    log_file = fopen("./log.txt", "a");
     // The variable server is a pointer to a structure of type hostent. This structure is defined in the header file netdb.h
 
     struct hostent *server = gethostbyname(argv[1]);
@@ -62,6 +75,7 @@ int main(int argc, char *argv[])
             i = 0;
         }
     }
+    logPrint("Producer Socket    : Data written\n");
     sleep(1);
 
     CHECK(close(fd_port));
