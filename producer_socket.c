@@ -1,3 +1,4 @@
+/* LIBRARIES */
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -8,37 +9,38 @@
 #include <time.h>
 #include "parameters.h"
 
-FILE *log_file;
+FILE *log_file; // log file
 
+/*FUNCTION HEADER*/
 void logPrint(char *string);
 
+/*FUNCTION*/
 void logPrint(char *string)
 {
     /* Function to print on log file adding time stamps. */
-
     time_t ltime = time(NULL);
     fprintf(log_file, "%.19s: %s", ctime(&ltime), string);
     fflush(log_file);
 }
 
+/*MAIN*/
 int main(int argc, char *argv[])
 {
-    int sockfd, data[MAX];
+    int sockfd;    // File descriptor
+    int data[MAX]; // Array of data to send
     struct sockaddr_in serv_addr;
     log_file = fopen("./log.txt", "a");
-    // The variable server is a pointer to a structure of type hostent. This structure is defined in the header file netdb.h
 
-    struct hostent *server = gethostbyname(argv[1]);
-    int noelement_to_send = atoi(argv[2]);
-    int portno;
+    /*  The variable server is a pointer to a structure of type hostent.
+        This structure is defined in the header file netdb.h*/
+    struct hostent *server = gethostbyname(argv[1]); // argv[1] contains the name of a host on the Internet
+    int noelement_to_send = atoi(argv[2]);           // number of element to send
+    int portno;                                      // Port number
+
     int fd_port = CHECK(open(PORT_PATH, O_RDONLY));
-    CHECK(read(fd_port, &portno, sizeof(int)));
+    CHECK(read(fd_port, &portno, sizeof(int))); // reading the port number
 
-    sockfd = CHECK(socket(AF_INET, SOCK_STREAM, 0));
-
-    // argv[1] contains the name of a host on the Internet
-    // gethostbyname() takes such a name as an argument and returns a pointer to a hostent containing information about that host.
-    // The field char *h_addr contains the IP address.
+    sockfd = CHECK(socket(AF_INET, SOCK_STREAM, 0)); // creating the socket in the Internet
 
     if (server == NULL)
     {
@@ -46,33 +48,33 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    // This code sets the fields in serv_addr. Much of it is the same as in the server. However, because the field
-    // server->h_addr is a character string, we use the function:
-    // void bcopy(char *s1, char *s2, int length)
-    // which copies length bytes from s1 to s2.
+    // This code sets the fields in serv_addr.
     bzero((char *)&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
     serv_addr.sin_port = htons(portno);
 
-    // The connect function is called by the client to establish a connection to the server. It takes three arguments,
-    // the socket file descriptor, the address of the host to which it wants to connect (including the port number),
-    // and the size of this address. This function returns 0 on success and -1 if it fails.
+    // The connect function is called by the client to establish a connection to the server.
     CHECK(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)));
 
-    // the client needs to know the port number of the server, but it does not need to know its own port
-    // number. This is typically assigned by the system when connect is called
+    for (int i = 0; i < MAX; i++)
+    {
+        // Filling the array with random integer values
+        data[i] = rand() % 10;
+    }
 
-    send_start_time();
+    send_start_time(); // Start time instant
 
     for (int i = 0; i < noelement_to_send; i++)
     {
         CHECK(write(sockfd, &data[i], sizeof(int)));
-
+        /*  We established a maximum array size of 250000 elements. Therefore we send
+            the same data of the same array multiple times. When the whole array has
+            been sent we make the for loop restart until all the data are sent.    */
         if (i == MAX)
         {
-            noelement_to_send = noelement_to_send - MAX;
-            i = 0;
+            noelement_to_send = noelement_to_send - MAX; // Reduce the number of element to send
+            i = 0;                                       // Restart the for loop
         }
     }
     logPrint("Producer Socket    : Data written\n");

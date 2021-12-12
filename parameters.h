@@ -1,7 +1,10 @@
+// DEFINING CONSTANNT VALUES
 #define SIZE 1000
 #define CBUFFER_SIZE 1000
 #define MAX 250000
 #define BUFFER_NOELEMENT 250
+
+// DEFINING PATHS
 #define SNAME_MUTEX "/sem_mutex"
 #define SNAME_NOTFULL "/sem_not_full"
 #define SNAME_NOTEMPTY "/sem_not_empty"
@@ -12,7 +15,6 @@
 #define PORT_PATH "/tmp/fifo_port"
 
 // COLORS
-
 #define RESET "\033[0m"
 #define BHBLK "\e[1;90m"
 #define BHRED "\e[1;91m"
@@ -23,9 +25,10 @@
 #define BHCYN "\e[1;96m"
 #define BHWHT "\e[1;97m"
 
-/* Defining CHECK() tool. By using this methid the code results ligher and cleaner. */
+// Defining CHECK() tool. By using this methid the code results ligher and cleaner.
 #define CHECK(X) ({int __val = (X); (__val == -1 ? ({fprintf(stdout,"ERROR (" __FILE__ ":%d) -- %s\n",__LINE__,strerror(errno)); exit(-1);-1;}) : __val); })
 
+// FUNCTION HEADERS
 void send_start_time();
 void send_end_time();
 void loading_bar(int percent, int buf_size);

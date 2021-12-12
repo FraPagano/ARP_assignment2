@@ -1,41 +1,24 @@
-Sun Dec 12 17:51:42: Master    : Log file created by master process.
-Sun Dec 12 17:51:42: Master process ID: 6259
-Sun Dec 12 17:51:44: Master    : '1' keyboard key pressed
-Sun Dec 12 17:51:46: Master    : 10.000000 MB inserted
-Sun Dec 12 17:51:46: Master    : Named pipe selected
-Sun Dec 12 17:51:46: Master    : Creating producer and consumer child processes
-Sun Dec 12 17:51:51: Producer Named    :Data written
-Sun Dec 12 17:51:51: Consumer Named    :Data read
-Sun Dec 12 17:51:52: Master    : Producer (PID = 6265) exited with status 0
-Sun Dec 12 17:51:52: Master    : Consumer (PID = 6266) exited with status 0
-Sun Dec 12 17:51:52: Master    : NAMED PIPE took 5096.758301 milliseconds to transfer 10.000000 MB
-Sun Dec 12 17:51:54: Master    : '2' keyboard key pressed
-Sun Dec 12 17:51:55: Master    : 10.000000 MB inserted
-Sun Dec 12 17:51:55: Master    : Creating producer and consumer child processes
-Sun Dec 12 17:51:57: Producer Unamed    :Data written
-Sun Dec 12 17:51:57: Producer Unnamed    :Data read
-Sun Dec 12 17:51:58: Master    : Producer (PID = 6267) exited with status 0
-Sun Dec 12 17:51:58: Master    : Consumer (PID = 6268) exited with status 0
-Sun Dec 12 17:51:58: Master    : Unnamed pipe took 1552.674805 milliseconds to transfer 10.000000 MB
-Sun Dec 12 17:52:00: Master    : '3' keyboard key pressed
-Sun Dec 12 17:52:02: Master    : 10.000000 MB inserted
-Sun Dec 12 17:52:02: Master    : Creating producer and consumer child processes
-Sun Dec 12 17:52:02: Consumer Socket    :Used port number: 37129 
-Sun Dec 12 17:52:04: Producer Socket    : Data written
-Sun Dec 12 17:52:04: Producer Socket    : Data read
-Sun Dec 12 17:52:05: Master    : Producer (PID = 6270) exited with status 0
-Sun Dec 12 17:52:05: Master    : Consumer (PID = 6269) exited with status 0
-Sun Dec 12 17:52:05: Master    : SOCKET took 2433.518799 milliseconds to transfer 10.000000 MB
-Sun Dec 12 17:52:07: Master    : '4' keyboard key pressed
-Sun Dec 12 17:52:08: Master    : 10.000000 MB inserted
-Sun Dec 12 17:52:08: Master    : Creating producer and consumer child processes
-Sun Dec 12 17:52:11: Consumer Shared Memory    :Data read
-Sun Dec 12 17:52:11: Producer Shared Memory    :Data written
-Sun Dec 12 17:52:12: Master    : Producer (PID = 6272) exited with status 0
-Sun Dec 12 17:52:12: Master    : Consumer (PID = 6273) exited with status 0
-Sun Dec 12 17:52:12: Master    : SHARED MEMORY took 3131.372070 milliseconds to transfer 10.000000 MB
-Sun Dec 12 17:52:12: Master    : Shared memory space unlinked
-Sun Dec 12 17:52:12: Master    : Semaphores unlinked
-Sun Dec 12 17:52:14: Master    : '5' keyboard key pressed
-Sun Dec 12 17:52:14: Master    : Exiting
-Sun Dec 12 17:52:14: Master    : Master is termitating 
+Sun Dec 12 19:02:11: Master    : Log file created by master process.
+Sun Dec 12 19:02:11: Master process ID: 8660
+Sun Dec 12 19:02:12: Master    : '3' keyboard key pressed
+Sun Dec 12 19:02:14: Master    : 10.000000 MB inserted
+Sun Dec 12 19:02:14: Master    : Creating producer and consumer child processes
+Sun Dec 12 19:02:14: Consumer Socket    :Used port number: 53437 
+Sun Dec 12 19:02:16: Producer Socket    : Data written
+Sun Dec 12 19:02:16: Producer Socket    : Data read
+Sun Dec 12 19:02:17: Master    : Producer (PID = 8662) exited with status 0
+Sun Dec 12 19:02:17: Master    : Consumer (PID = 8661) exited with status 0
+Sun Dec 12 19:02:17: Master    : SOCKET took 2667.775879 milliseconds to transfer 10.000000 MB
+Sun Dec 12 19:02:22: Master    : '4' keyboard key pressed
+Sun Dec 12 19:02:22: Master    : 10.000000 MB inserted
+Sun Dec 12 19:02:22: Master    : Creating producer and consumer child processes
+Sun Dec 12 19:02:26: Producer Shared Memory    :Data written
+Sun Dec 12 19:02:26: Consumer Shared Memory    :Data read
+Sun Dec 12 19:02:27: Master    : Producer (PID = 8663) exited with status 0
+Sun Dec 12 19:02:27: Master    : Consumer (PID = 8664) exited with status 0
+Sun Dec 12 19:02:27: Master    : SHARED MEMORY took 3920.889404 milliseconds to transfer 10.000000 MB
+Sun Dec 12 19:02:27: Master    : Shared memory space unlinked
+Sun Dec 12 19:02:27: Master    : Semaphores unlinked
+Sun Dec 12 19:02:56: Master    : '5' keyboard key pressed
+Sun Dec 12 19:02:56: Master    : Exiting
+Sun Dec 12 19:02:56: Master    : Master is termitating 
