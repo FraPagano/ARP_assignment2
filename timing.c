@@ -42,7 +42,7 @@ void send_end_time()
 void loading_bar(int percent, int buf_size)
 {
     const int PROG = 30;
-    int num_chars = (percent / (buf_size / 100)) * PROG / 100;
+    int num_chars = (percent/ (buf_size / 100)) * PROG / 100;
     printf("\r[");
     for (int i = 0; i <= num_chars; i++)
     {

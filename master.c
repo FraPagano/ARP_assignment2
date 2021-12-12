@@ -10,6 +10,7 @@
 #include <semaphore.h>
 #include <sys/mman.h>
 #include <time.h>
+#include <signal.h>
 
 #include "parameters.h"
 
@@ -153,8 +154,28 @@ double closing_function()
     CHECK(close(fd_time_start));
     CHECK(close(fd_time_end));
 
-    printf(BHCYN "Producer (PID = %d) exited with status %d" RESET "\n", pid_producer, prod_status);
-    printf(BHCYN "Consumer (PID = %d) exited with status %d" RESET "\n", pid_consumer, cons_status);
+    printf(BHCYN "\n\nProducer " BHYEL " (PID = %d)" BHCYN " exited with status " BHGRN "%d" RESET "\n", pid_producer, prod_status);
+    printf(BHCYN "Consumer " BHYEL "(PID = %d) " BHCYN "exited with status " BHGRN " %d" RESET "\n", pid_consumer, cons_status);
+
+    if (prod_status != 0 || cons_status != 0)
+    {
+
+        printf(BHRED "\n An error occurred, killing all processes..." RESET "\n");
+        logPrint("An error occurred, killing all processes...\n");
+
+        printf(BHCYN "\n\nProducer " BHRED "(PID = %d) " BHCYN " exited with status " BHRED "%d" RESET "\n", pid_producer, prod_status);
+        printf(BHCYN "Consumer " BHRED "(PID = %d)" BHCYN " exited with status " BHRED "%d" RESET "\n", pid_consumer, cons_status);
+
+        sprintf(str, "Master    : Producer (PID = %d) exited with status %d\n", pid_producer, prod_status);
+        logPrint(str);
+
+        sprintf(str, "Master    : Consumer (PID = %d) exited with status %d\n", pid_consumer, cons_status);
+        logPrint(str);
+
+        kill(pid_producer, SIGKILL);
+        kill(pid_consumer, SIGKILL);
+        kill(getpid(), SIGKILL);
+    }
 
     sprintf(str, "Master    : Producer (PID = %d) exited with status %d\n", pid_producer, prod_status);
     logPrint(str);
@@ -169,7 +190,6 @@ double closing_function()
 int main()
 {
     FILE *tests = fopen("./tests_performed.txt", "w");
-
     FILE *log_file_create = fopen("./log.txt", "w");
 
     if (!log_file_create)
@@ -180,10 +200,13 @@ int main()
     log_file = fopen("./log.txt", "a");
 
     logPrint("Master    : Log file created by master process.\n");
+    printf(BHWHT "\nMaster process ID: " BHYEL "%d" RESET "\n\n", getpid());
+    sprintf(str, "Master process ID: %d\n", getpid());
+    logPrint(str);
+
     create_fifo(TSTART_PATH);
     create_fifo(TEND_PATH);
 
-    // long int start, end;
     while (1)
     {
         int command = interpreter();
