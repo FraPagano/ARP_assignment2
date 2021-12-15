@@ -1,4 +1,0 @@
----> SOCKET took 2667.775879 milliseconds to transfer 10.000000 MB.
- 
----> SHARED MEMORY took 3920.889404 milliseconds to transfer 10.000000 MB.
- 

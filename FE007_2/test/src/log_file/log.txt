@@ -1,0 +1,5 @@
+Wed Dec 15 23:07:55: Master    : Log file created by master process.
+Wed Dec 15 23:07:55: Master process ID: 10984
+Wed Dec 15 23:07:59: Master    : '5' keyboard key pressed
+Wed Dec 15 23:07:59: Master    : Exiting
+Wed Dec 15 23:07:59: Master    : Master is termitating 

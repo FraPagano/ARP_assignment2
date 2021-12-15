@@ -5,9 +5,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <netdb.h>
-#include "sys/socket.h"
+#include <sys/socket.h>
 #include <time.h>
-#include "parameters.h"
+#include "../parameters/parameters.h"
+#include "../timing/timing.c"
 
 FILE *log_file;
 char str[80];
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
     // n is the return value for the read() and write() calls; i.e. it contains the number of characters read or written.
     int sockfd, newsockfd, clilen, B[MAX], data;
     int j = 0;
-    log_file = fopen("./log.txt", "a");
+    log_file = fopen("../log_file/log.txt", "a");
     int portno;
     int total_elements = atoi(argv[1]);
     int noelement_to_read = total_elements;

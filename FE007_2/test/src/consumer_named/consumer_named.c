@@ -6,7 +6,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
-#include "parameters.h"
+#include "../parameters/parameters.h"
+#include "../timing/timing.c"
 
 FILE *log_file;
 void logPrint(char *string);
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
 {
     int data, fd, B[MAX];
     int j = 0;
-    log_file = fopen("./log.txt", "a");
+    log_file = fopen("../log_file/log.txt", "a");
 
     int total_elements = atoi(argv[1]);
     int noelement_to_read = total_elements;

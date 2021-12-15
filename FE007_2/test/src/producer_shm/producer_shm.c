@@ -8,7 +8,9 @@
 #include <semaphore.h>
 #include <sys/mman.h>
 #include <time.h>
-#include "parameters.h"
+#include "../parameters/parameters.h"
+#include "../timing/timing.c"
+
 FILE *log_file;
 
 /*FUNCTION HEADER*/
@@ -29,7 +31,7 @@ int main(int argc, char *argv[])
     int data[MAX]; // Array of data to read
     int head = 0;  // head of circular buffer
 
-    log_file = fopen("./log.txt", "a");
+    log_file = fopen("../log_file/log.txt", "a");
 
     int noelement_to_send = atoi(argv[1]);
 

@@ -13,7 +13,8 @@
 #include <signal.h>
 
 /*HEADER FILE. This file contains all the file paths, function headers, the CHECK function declaration and colors arrays */
-#include "parameters.h"
+#include "../parameters/parameters.h"
+#include "../timing/timing.c"
 
 /*GLOBAL VARIABLES*/
 int pid_producer;
@@ -197,8 +198,8 @@ but also read time intervals from a named pipe*/
 /* MAIN */
 int main()
 {
-    FILE *tests = fopen("./tests_performed.txt", "w"); // This '.txt' file contains a short recap of the taken time intervals
-    FILE *log_file_create = fopen("./log.txt", "w");   // Log file create
+    FILE *tests = fopen("../tests/tests_performed.txt", "w");  // This '.txt' file contains a short recap of the taken time intervals
+    FILE *log_file_create = fopen("../log_file/log.txt", "w"); // Log file create
 
     if (!log_file_create)
     {
@@ -207,7 +208,7 @@ int main()
         return -2; // return value put at -2 just to avoid confusing with the CHECK function control.
     }
 
-    log_file = fopen("./log.txt", "a"); // Log file append
+    log_file = fopen("../log_file/log.txt", "a"); // Log file append
     logPrint("Master    : Log file created by master process.\n");
 
     // Make the Master process ID avaible to the shell
