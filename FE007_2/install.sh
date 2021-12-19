@@ -23,8 +23,9 @@ echo "Begin program installation on $1 ... ";
 unzip ./src.zip;	#Unzip the src folder
 mv ./src $1;		#move the unzipped src folder in the <pathname> directiory
 cp run.sh $1;		#copy the run bash in the <pathname> directiory
+cp help.sh $1;
 #cp ./README.txt $1;	#copy the README.txt in the <pathname> directiory
-#cp ./general_instructions.txt $1;	#copy the general_instructions.txt in the <pathname> directiory
+cp ./general_instructions.txt $1;	#copy the general_instructions.txt in the <pathname> directiory
 
 
 echo "Program installed on $1";
