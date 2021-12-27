@@ -18,4 +18,3 @@ more -d ./src/consumer_shm/consumer_shm.txt;
 more -d ./src/parameters/parameters.txt;
 
 more -d ./src/timing/timing.txt;
-
