@@ -1,4 +1,4 @@
-more -d ./general_instructions.txt;
+more -d ./README.txt;
 
 more -d ./src/master/master.txt;
 
